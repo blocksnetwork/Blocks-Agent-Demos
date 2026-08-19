@@ -1,0 +1,45 @@
+# Secrets — never commit real keys. Use the .env.example files as templates.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials.json
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+.venv/
+__pycache__/
+
+# Build output
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Deploy
+.vercel
+
+# Test artifacts
+coverage/
+
+# Local sample media used when testing agents by hand
+sample-plant.jpg
+sample-*.jpeg
+sample-*.png
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

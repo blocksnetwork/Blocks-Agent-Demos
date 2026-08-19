@@ -1,0 +1,59 @@
+{
+  "identity": {
+    "agentName": "plant_doctor_blocks",
+    "displayName": "Plant Doctor",
+    "description": "Diagnoses plant health from a photo and returns the likely problem plus a fix.",
+    "version": "1.0.0",
+    "provider": {
+      "organization": "Markus Kohler"
+    }
+  },
+  "capabilities": {
+    "taskKinds": [
+      "request"
+    ]
+  },
+  "io": {
+    "inputs": [
+      {
+        "id": "photo",
+        "description": "A photo of the plant you are worried about. Get close enough that the leaves fill most of the frame.",
+        "contentType": "image/jpeg",
+        "required": true,
+        "accept": [
+          "image/jpeg",
+          "image/png",
+          "image/webp"
+        ],
+        "maxSizeBytes": 10485760
+      }
+    ],
+    "outputs": [
+      {
+        "id": "diagnosis",
+        "description": "What the plant most likely has, how confident the model is, and what to do about it.",
+        "contentType": "text/markdown",
+        "guaranteed": true
+      }
+    ]
+  },
+  "tags": [
+    {
+      "id": "diagnosis",
+      "name": "Plant diagnosis",
+      "description": "Identify disease, pests, over-watering, and nutrient problems from a single photo.",
+      "examples": [
+        "Yellowing leaves with brown crispy edges on a fiddle leaf fig",
+        "White powdery coating on squash leaves",
+        "Dark spreading blotches on tomato foliage"
+      ]
+    }
+  ],
+  "runtime": {
+    "handler": "./handler.ts",
+    "handlerExport": "default",
+    "concurrency": 1,
+    "expectedInstances": 1,
+    "maxRunningTimeSec": 180
+  }
+}

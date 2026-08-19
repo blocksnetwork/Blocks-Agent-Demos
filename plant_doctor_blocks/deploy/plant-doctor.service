@@ -1,0 +1,18 @@
+[Unit]
+Description=Plant Doctor Blocks agent
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/home/ec2-user/plant_doctor_blocks
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/local/bin/blocks run
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/plant-doctor.log
+StandardError=append:/var/log/plant-doctor.log
+
+[Install]
+WantedBy=multi-user.target
