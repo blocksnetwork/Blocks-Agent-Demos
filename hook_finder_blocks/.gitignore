@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+*.mp4
+*.mov
+*.mp3
+*.m4a
+*.wav

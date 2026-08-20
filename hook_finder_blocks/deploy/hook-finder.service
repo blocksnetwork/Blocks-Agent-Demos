@@ -1,21 +1,21 @@
 [Unit]
-Description=Plant Doctor Blocks agent
+Description=Hook Finder Blocks agent
 After=network-online.target docker.service
 Wants=network-online.target
 
 [Service]
 Type=simple
 User=ec2-user
-WorkingDirectory=/home/ec2-user/Blocks-Agent-Demos/plant_doctor_blocks
+WorkingDirectory=/home/ec2-user/Blocks-Agent-Demos/hook_finder_blocks
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
 # Secrets live outside the repo so a clone or pull can never overwrite or
-# expose them. See deploy/README.md.
-EnvironmentFile=/etc/plant-doctor/env
+# expose them.
+EnvironmentFile=/etc/hook-finder/env
 ExecStart=/usr/local/bin/blocks run
 Restart=always
 RestartSec=10
-StandardOutput=append:/var/log/plant-doctor.log
-StandardError=append:/var/log/plant-doctor.log
+StandardOutput=append:/var/log/hook-finder.log
+StandardError=append:/var/log/hook-finder.log
 
 [Install]
 WantedBy=multi-user.target

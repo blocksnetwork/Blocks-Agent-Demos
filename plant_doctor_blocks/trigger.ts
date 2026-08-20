@@ -23,18 +23,33 @@ async function main() {
 
   console.log(`Sent ${photo} -- task ${session.taskId}`);
 
+  // onTerminal can fire while onArtifact is still awaiting the download,
+  // so hold the artifact work and drain it before exiting.
+  const pending: Array<Promise<void>> = [];
+
   session.onProgress((event: ProgressEvent) => {
     console.log('[progress]', event.message ?? event.progress ?? '');
   });
-  session.onArtifact(async (event: ArtifactEvent) => {
-    const ref = event.artifactRef;
-    const bytes =
-      ref.kind === 'inline' && ref.data
-        ? decodeInlineArtifact(ref)
-        : (await session.downloadArtifact(ref)).data;
-    console.log('\n' + new TextDecoder().decode(bytes) + '\n');
+
+  session.onArtifact((event: ArtifactEvent) => {
+    pending.push(
+      (async () => {
+        const ref = event.artifactRef;
+        const bytes =
+          ref.kind === 'inline' && ref.data
+            ? decodeInlineArtifact(ref)
+            : (await session.downloadArtifact(ref)).data;
+        console.log('\n' + new TextDecoder().decode(bytes) + '\n');
+      })(),
+    );
   });
-  session.onTerminal((_event: TerminalEvent) => {
+
+  session.onTerminal(async (event: TerminalEvent) => {
+    await Promise.allSettled(pending);
+    if (pending.length === 0) {
+      console.log('[warning] task ended with no artifact');
+      console.log('[terminal]', JSON.stringify(event, null, 2));
+    }
     console.log('[done]');
     session.close();
     client.destroy();
@@ -43,3 +58,4 @@ async function main() {
 }
 
 main().catch(console.error);
+

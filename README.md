@@ -14,6 +14,8 @@ ports, no DNS, no SSL certificates, no load balancer, and no auth system to buil
 | Demo | What it does | Stack |
 |---|---|---|
 | [`plant_doctor_blocks`](./plant_doctor_blocks) | Send a plant photo, get a markdown diagnosis with confidence, visual evidence, and a numbered fix | Blocks provider agent, TypeScript, vLLM + Qwen3.5-4B vision |
+| [`plant-web`](./plant-web) | The consumer side of the same agent: upload one photo, watch the run, read the diagnosis | Next.js 16, React 19, Tailwind 4 |
+| [`hook_finder_blocks`](./hook_finder_blocks) | Send a recording, get the three strongest short-form clips with timestamps, verbatim quotes, and captions | Blocks provider agent, TypeScript, faster-whisper + vLLM |
 | [`spin-web`](./spin-web) | Picks a demo idea at random by category and maps each to an open-weights model that fits a single GPU | Next.js 16, React 19, Tailwind 4 |
 
 ### plant_doctor_blocks
@@ -52,6 +54,57 @@ Bind vLLM to `127.0.0.1` only. The agent reaches it over localhost, so nothing a
 it needs to face the internet. [`deploy/`](./plant_doctor_blocks/deploy) has a systemd
 unit and a pull-and-restart script for running the agent on an EC2 GPU box.
 
+### plant-web
+
+The other half of the plant doctor: a Next.js front end that calls the agent as a
+consumer. The API key never reaches the browser — the photo is posted to a route
+handler, which is the only place `TaskClient` is constructed, and the task is
+streamed back to the page as server-sent events so the progress panel follows the
+agent's real status updates.
+
+```bash
+cd plant-web
+npm install
+cp .env.example .env.local  # the same BLOCKS_API_KEY the agent uses
+npm run dev                 # http://localhost:3000
+```
+
+### hook_finder_blocks
+
+Two models in one handler. The uploaded recording goes to a small faster-whisper
+service for timestamped transcription, and the transcript goes to the same vLLM
+server the plant doctor uses, which ranks it into three clips worth posting.
+
+```bash
+cd hook_finder_blocks
+npm install
+cp .env.example .env        # then: blocks login --write-env
+npm run check
+npm start                   # blocks run
+```
+
+```bash
+npx tsx trigger.ts ./recording.mp4
+```
+
+Blocks caps a single input at 25MB, so `trigger.ts` strips the video and re-encodes
+the audio to 64kbps mono before uploading — that fits about an hour of speech.
+It needs `ffmpeg` on your machine; audio files already under the cap skip the step.
+
+[`deploy/whisper/`](./hook_finder_blocks/deploy/whisper) builds the transcription
+service. On a 15GB card it coexists with the 4B vision model: run vLLM at
+`--gpu-memory-utilization 0.80` and Whisper in `int8_float16`, which leaves both
+resident with room to spare.
+
+```bash
+cd hook_finder_blocks/deploy/whisper
+docker build -t whisper-svc .
+docker run -d --name whisper --restart unless-stopped \
+  --runtime nvidia --gpus all \
+  -v /opt/hf-cache:/root/.cache/huggingface \
+  -p 127.0.0.1:8001:8001 whisper-svc
+```
+
 ### spin-web
 
 A one-page web UI for choosing what to build next. Twelve categories, each with
@@ -69,6 +122,8 @@ npm run dev                 # http://localhost:3000
 - The Blocks CLI and an account — `blocks login --write-env`
 - For `plant_doctor_blocks`: a GPU with ~10GB of free VRAM, or any reachable
   OpenAI-compatible endpoint via `VLLM_URL`
+- For `hook_finder_blocks`: the same endpoint plus ~1.5GB more VRAM for Whisper,
+  and `ffmpeg` locally to extract audio before upload
 
 ## A note on secrets
 
@@ -76,6 +131,11 @@ No credentials are committed to this repo. Every demo reads its key from the
 environment, `.env*` is ignored, and `.env.example` files document what you need to
 supply. Agents start **private and free** on Blocks — publish only when you mean to.
 
+On a deployed box the key belongs outside the working tree entirely. The systemd
+units read an `EnvironmentFile` at `/etc/<agent>/env`, owned by root and mode 600,
+so pulling — or even deleting and re-cloning — can never overwrite or expose it.
+
 ## License
 
 MIT
+

@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  --color-leaf: #4caf50;
+  --color-leaf-light: #6fcf4b;
+  --color-leaf-deep: #3e9142;
+  --color-leaf-dark: #2f7233;
+  --color-pale: #eaf7e3;
+  --color-mint: #f1faec;
+
+  --color-canvas: #f7f8f7;
+  --color-ink: #111815;
+  --color-body: #6b7772;
+  --color-mute: #9aa5a0;
+
+  --color-chip: #f2f4f2;
+  --color-chip-hover: #e8ebe8;
+  --color-rail: #dfe4e0;
+  --color-dot: #c9d3cd;
+  --color-line: rgb(17 24 21 / 0.06);
+
+  --color-amber: #a6741a;
+  --color-amber-bg: #fdf5e4;
+  --color-coral: #b4483c;
+  --color-coral-bg: #fbeeec;
+
+  --radius-card: 28px;
+  --radius-frame: 22px;
+  --radius-panel: 20px;
+  --radius-block: 18px;
+
+  --shadow-card: 0 10px 34px rgb(17 24 21 / 0.07);
+  --shadow-card-soft: 0 10px 34px rgb(17 24 21 / 0.06);
+  --shadow-card-softer: 0 10px 34px rgb(17 24 21 / 0.05);
+  --shadow-ghost: 0 6px 20px rgb(17 24 21 / 0.07);
+  --shadow-pill: 0 2px 10px rgb(17 24 21 / 0.1);
+  --shadow-leaf: 0 8px 20px rgb(76 175 80 / 0.28);
+  --shadow-leaf-sm: 0 8px 20px rgb(76 175 80 / 0.26);
+  --shadow-leaf-lg: 0 10px 24px rgb(76 175 80 / 0.28);
+  --shadow-leaf-hover: 0 14px 30px rgb(76 175 80 / 0.36);
+  --shadow-drop-active:
+    0 0 0 2px #4caf50, 0 14px 40px rgb(76 175 80 / 0.18);
+
+  --font-sans: var(--font-outfit), system-ui, sans-serif;
+
+  --animate-in: pdIn 220ms ease-out;
+  --animate-in-slow: pdIn 240ms ease-out;
+  --animate-spin-ring: pdSpin 900ms linear infinite;
+  --animate-pulse-step: pdPulse 1400ms ease-in-out infinite;
+
+  @keyframes pdIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pdSpin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes pdPulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-leaf-deep);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-leaf-dark);
+}
+
+button:focus-visible,
+label:focus-within {
+  outline: 2px solid var(--color-leaf);
+  outline-offset: 3px;
+}
+
+/* The transparency backdrop behind cut-out PNGs. */
+.checkerboard {
+  background: repeating-conic-gradient(#eef0ee 0% 25%, #ffffff 0% 50%) 50% /
+    18px 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

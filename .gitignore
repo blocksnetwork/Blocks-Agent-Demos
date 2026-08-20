@@ -28,6 +28,11 @@ next-env.d.ts
 # Test artifacts
 coverage/
 
+# Internal planning docs — this repo is public, keep strategy notes local
+*-Playbook.md
+notes/
+docs/private/
+
 # Local sample media used when testing agents by hand
 sample-plant.jpg
 sample-*.jpeg
@@ -43,3 +48,4 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
