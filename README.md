@@ -14,7 +14,7 @@ ports, no DNS, no SSL certificates, no load balancer, and no auth system to buil
 | Demo | What it does | Stack |
 |---|---|---|
 | [`plant_doctor_blocks`](./plant_doctor_blocks) | Send a plant photo, get a markdown diagnosis with confidence, visual evidence, and a numbered fix | Blocks provider agent, TypeScript, vLLM + Qwen3.5-4B vision |
-| [`plant-web`](./plant-web) | The consumer side of the same agent: upload one photo, watch the run, read the diagnosis | Next.js 16, React 19, Tailwind 4 |
+| [`plant_doctor_blocks/plant-web`](./plant_doctor_blocks/plant-web) | The consumer side of the same agent: upload one photo, watch the run, read the diagnosis | Next.js 16, React 19, Tailwind 4 |
 | [`hook_finder_blocks`](./hook_finder_blocks) | Send a recording, get the three strongest short-form clips with timestamps, verbatim quotes, and captions | Blocks provider agent, TypeScript, faster-whisper + vLLM |
 | [`spin-web`](./spin-web) | Picks a demo idea at random by category and maps each to an open-weights model that fits a single GPU | Next.js 16, React 19, Tailwind 4 |
 
@@ -54,16 +54,16 @@ Bind vLLM to `127.0.0.1` only. The agent reaches it over localhost, so nothing a
 it needs to face the internet. [`deploy/`](./plant_doctor_blocks/deploy) has a systemd
 unit and a pull-and-restart script for running the agent on an EC2 GPU box.
 
-### plant-web
+### plant_doctor_blocks/plant-web
 
-The other half of the plant doctor: a Next.js front end that calls the agent as a
-consumer. The API key never reaches the browser — the photo is posted to a route
+The other half of the plant doctor, and the reason it lives inside the agent's
+folder: a Next.js front end that calls that one agent as a consumer. The API key never reaches the browser — the photo is posted to a route
 handler, which is the only place `TaskClient` is constructed, and the task is
 streamed back to the page as server-sent events so the progress panel follows the
 agent's real status updates.
 
 ```bash
-cd plant-web
+cd plant_doctor_blocks/plant-web
 npm install
 cp .env.example .env.local  # the same BLOCKS_API_KEY the agent uses
 npm run dev                 # http://localhost:3000
