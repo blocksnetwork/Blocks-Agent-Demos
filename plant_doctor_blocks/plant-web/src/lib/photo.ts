@@ -189,3 +189,55 @@ export async function analyzePhoto(file: File): Promise<PhotoResult> {
     },
   };
 }
+
+/**
+ * Serverless request bodies cap out well below the 10 MB choose limit
+ * (Netlify's functions reject anything much past 6 MB), and the model gains
+ * nothing above ~1600 px anyway. Anything heavy is re-encoded in the browser
+ * before upload; anything that cannot be re-encoded is sent as-is and left
+ * to the server-side limits to arbitrate.
+ */
+const UPLOAD_TARGET_BYTES = 4 * 1024 * 1024;
+const UPLOAD_MAX_EDGE_PX = 1600;
+const UPLOAD_JPEG_QUALITY = 0.85;
+
+function toJpegBlob(canvas: HTMLCanvasElement): Promise<Blob | null> {
+  return new Promise((resolve) =>
+    canvas.toBlob(resolve, "image/jpeg", UPLOAD_JPEG_QUALITY),
+  );
+}
+
+export async function prepareUpload(file: File): Promise<File> {
+  if (file.size <= UPLOAD_TARGET_BYTES) return file;
+
+  const url = URL.createObjectURL(file);
+  try {
+    const image = await load(url);
+    const longEdge = Math.max(image.naturalWidth, image.naturalHeight);
+    const scale = Math.min(1, UPLOAD_MAX_EDGE_PX / longEdge);
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+    if (!context) return file;
+
+    // JPEG has no alpha channel; transparent regions land on white.
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+
+    const blob = await toJpegBlob(canvas);
+    if (!blob || blob.size >= file.size) return file;
+
+    const name = file.name.replace(/\.[^.]+$/, "") || "photo";
+    return new File([blob], `${name}.jpg`, { type: "image/jpeg" });
+  } catch {
+    return file;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}

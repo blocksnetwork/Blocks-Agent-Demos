@@ -21,7 +21,7 @@ import {
 } from "@/lib/messages";
 import { analyzePhoto, typeLabel, type Photo, type PhotoRejection } from "@/lib/photo";
 import type { FailureKind } from "@/lib/protocol";
-import { streamDiagnosis } from "@/lib/stream";
+import { runDiagnosis } from "@/lib/diagnose-client";
 
 /** How long "Asking the model…" runs before we admit it is taking a while. */
 const SLOW_AFTER_SECONDS = 40;
@@ -110,7 +110,7 @@ export default function Home() {
     setPhase({ name: "running", stage: "uploading" });
 
     try {
-      await streamDiagnosis(current.file, controller.signal, (event) => {
+      await runDiagnosis(current.file, controller.signal, (event) => {
         switch (event.type) {
           case "accepted":
             if (event.queued) setPhase({ name: "queued" });
