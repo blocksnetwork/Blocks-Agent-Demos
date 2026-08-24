@@ -1,7 +1,7 @@
 # plant-web
 
-The web client for [`plant_doctor_blocks`](../plant_doctor_blocks). One photo in,
-one plant diagnosis out — no login, no history, no database.
+The web client for [`plant_doctor_blocks`](..), living inside the agent it calls.
+One photo in, one plant diagnosis out — no login, no history, no database.
 
 ```bash
 npm install
@@ -64,4 +64,5 @@ locally too, which is what drives the frame notes on the preview.
 
 Built with Next.js 16, React 19, and Tailwind 4.
 
-Part of [Blocks Agent Demos](../README.md).
+Part of [Blocks Agent Demos](../../README.md).
+

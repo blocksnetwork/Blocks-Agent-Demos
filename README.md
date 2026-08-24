@@ -16,7 +16,7 @@ ports, no DNS, no SSL certificates, no load balancer, and no auth system to buil
 | [`plant_doctor_blocks`](./plant_doctor_blocks) | Send a plant photo, get a markdown diagnosis with confidence, visual evidence, and a numbered fix | Blocks provider agent, TypeScript, vLLM + Qwen3.5-4B vision |
 | [`plant_doctor_blocks/plant-web`](./plant_doctor_blocks/plant-web) | The consumer side of the same agent: upload one photo, watch the run, read the diagnosis | Next.js 16, React 19, Tailwind 4 |
 | [`hook_finder_blocks`](./hook_finder_blocks) | Send a recording, get the three strongest short-form clips with timestamps, verbatim quotes, and captions | Blocks provider agent, TypeScript, faster-whisper + vLLM |
-| [`spin-web`](./spin-web) | Picks a demo idea at random by category and maps each to an open-weights model that fits a single GPU | Next.js 16, React 19, Tailwind 4 |
+| [`hook_finder_blocks/hook-web`](./hook_finder_blocks/hook-web) | The consumer side: drop audio or video, watch the run, play each pick against the footage | Next.js 16, React 19, Tailwind 4, WebCodecs |
 
 ### plant_doctor_blocks
 
@@ -105,16 +105,62 @@ docker run -d --name whisper --restart unless-stopped \
   -p 127.0.0.1:8001:8001 whisper-svc
 ```
 
-### spin-web
+### hook_finder_blocks/hook-web
 
-A one-page web UI for choosing what to build next. Twelve categories, each with
-product ideas paired to a specific open-weights model and its VRAM footprint.
+The consumer side of the hook finder, and the reason video is worth accepting at
+all. Blocks caps a task input at 25MB and a screen recording is routinely twenty
+times that — but the picture was never the payload, so the browser strips the
+video track, downmixes to mono Opus and uploads only that. A 40-second 720p
+capture goes up as 67KB.
+
+The frames never leave the tab, which is what makes the results screen work:
+each pick plays against the footage it came from, seeked to its own timestamp.
 
 ```bash
-cd spin-web
+cd hook_finder_blocks/hook-web
 npm install
+cp .env.example .env.local  # the same BLOCKS_API_KEY the agent uses
 npm run dev                 # http://localhost:3000
 ```
+
+Encoding is WebCodecs plus a small Ogg muxer, so there is no ffmpeg.wasm payload
+and no server-side transcode — see [its README](./hook_finder_blocks/hook-web)
+for how a file becomes an upload. You can also record straight into the page,
+which skips the conversion entirely since `MediaRecorder` already produces Opus.
+
+## The models
+
+Nothing here calls a hosted API. Both agents run open-weights models on hardware
+you control, under licences that permit commercial use, and they share a single
+GPU between them.
+
+| Model | Role | Served by | Licence |
+|---|---|---|---|
+| [Qwen3.5-4B](https://huggingface.co/Qwen/Qwen3.5-4B) | Vision diagnosis, clip ranking | [vLLM](https://github.com/vllm-project/vllm) | Apache 2.0 |
+| [Whisper large-v3-turbo](https://huggingface.co/openai/whisper-large-v3-turbo) | Timestamped transcription | [faster-whisper](https://github.com/SYSTRAN/faster-whisper) | MIT |
+
+**Qwen3.5-4B** does both language jobs. It is a vision-language model
+(`image-text-to-text`), so `plant_doctor_blocks` sends it the photo directly,
+while `hook_finder_blocks` uses the same weights as a text model to rank a
+transcript. It is served here with a 16,384-token context, which is what bounds
+how much transcript the hook finder can weigh in one pass — and therefore why the
+handler trims a long recording from the middle rather than truncating the end.
+
+**Whisper large-v3-turbo** does the transcription, and the segment timings it
+returns are what every clip timestamp is ultimately built from — including the
+block boundaries described above, which is why they land on real pauses. Credit
+where it is due: the model is OpenAI's, from [Radford et al.,
+2022](https://arxiv.org/abs/2212.04356). `faster-whisper` does not load those
+weights directly, though; it resolves `large-v3-turbo` to a
+[CTranslate2](https://github.com/OpenNMT/CTranslate2) conversion of them,
+[`mobiuslabsgmbh/faster-whisper-large-v3-turbo`](https://huggingface.co/mobiuslabsgmbh/faster-whisper-large-v3-turbo),
+which is what the container actually downloads. Running that in `int8_float16` is
+what lets transcription sit alongside the 4B model on one card.
+
+Neither agent is bound to these choices. `VLLM_MODEL` and `WHISPER_MODEL` are
+read from the environment, and `VLLM_URL` can point at any OpenAI-compatible
+endpoint, so swapping in a larger model — or one you host elsewhere — needs no
+code change.
 
 ## Requirements
 
@@ -123,7 +169,8 @@ npm run dev                 # http://localhost:3000
 - For `plant_doctor_blocks`: a GPU with ~10GB of free VRAM, or any reachable
   OpenAI-compatible endpoint via `VLLM_URL`
 - For `hook_finder_blocks`: the same endpoint plus ~1.5GB more VRAM for Whisper,
-  and `ffmpeg` locally to extract audio before upload
+  and `ffmpeg` locally to extract audio before upload — `hook-web` needs neither,
+  since the browser does the extraction
 
 ## A note on secrets
 
