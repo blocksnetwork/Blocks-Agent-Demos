@@ -1,0 +1,21 @@
+[Unit]
+Description=Clip Scout Blocks agent
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/home/ec2-user/Blocks-Agent-Demos/clip_scout_blocks
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+# Secrets live outside the repo so a clone or pull can never overwrite or
+# expose them.
+EnvironmentFile=/etc/hook-finder/env
+ExecStart=/usr/local/bin/blocks run
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/hook-finder.log
+StandardError=append:/var/log/hook-finder.log
+
+[Install]
+WantedBy=multi-user.target

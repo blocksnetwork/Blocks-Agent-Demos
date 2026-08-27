@@ -15,8 +15,8 @@ ports, no DNS, no SSL certificates, no load balancer, and no auth system to buil
 |---|---|---|
 | [`plant_doctor_blocks`](./plant_doctor_blocks) | Send a plant photo, get a markdown diagnosis with confidence, visual evidence, and a numbered fix | Blocks provider agent, TypeScript, vLLM + Qwen3.5-4B vision |
 | [`plant_doctor_blocks/plant-web`](./plant_doctor_blocks/plant-web) | The consumer side of the same agent: upload one photo, watch the run, read the diagnosis | Next.js 16, React 19, Tailwind 4 |
-| [`hook_finder_blocks`](./hook_finder_blocks) | Send a recording, get the three strongest short-form clips with timestamps, verbatim quotes, and captions | Blocks provider agent, TypeScript, faster-whisper + vLLM |
-| [`hook_finder_blocks/hook-web`](./hook_finder_blocks/hook-web) | The consumer side: drop audio or video, watch the run, play each pick against the footage | Next.js 16, React 19, Tailwind 4, WebCodecs |
+| [`clip_scout_blocks`](./clip_scout_blocks) | Send a recording, get the three strongest short-form clips with timestamps, verbatim quotes, and captions | Blocks provider agent, TypeScript, faster-whisper + vLLM |
+| [`clip_scout_blocks/clip-web`](./clip_scout_blocks/clip-web) | The consumer side: drop audio or video, watch the run, play each pick against the footage | Next.js 16, React 19, Tailwind 4, WebCodecs |
 
 ### plant_doctor_blocks
 
@@ -58,8 +58,10 @@ unit and a pull-and-restart script for running the agent on an EC2 GPU box.
 
 The other half of the plant doctor, and the reason it lives inside the agent's
 folder: a Next.js front end that calls that one agent as a consumer. The API key never reaches the browser — the photo is posted to a route
-handler, which is the only place `TaskClient` is constructed, and the task is
-streamed back to the page as server-sent events so the progress panel follows the
+handler, which is the only place `TaskClient` is constructed. The start route
+returns the taskId immediately and the page polls a status route for snapshots,
+so no invocation lasts more than a few seconds — which is what lets the app run
+on serverless hosts like Netlify — while the progress panel still follows the
 agent's real status updates.
 
 ```bash
@@ -69,14 +71,14 @@ cp .env.example .env.local  # the same BLOCKS_API_KEY the agent uses
 npm run dev                 # http://localhost:3000
 ```
 
-### hook_finder_blocks
+### clip_scout_blocks
 
 Two models in one handler. The uploaded recording goes to a small faster-whisper
 service for timestamped transcription, and the transcript goes to the same vLLM
 server the plant doctor uses, which ranks it into three clips worth posting.
 
 ```bash
-cd hook_finder_blocks
+cd clip_scout_blocks
 npm install
 cp .env.example .env        # then: blocks login --write-env
 npm run check
@@ -91,13 +93,13 @@ Blocks caps a single input at 25MB, so `trigger.ts` strips the video and re-enco
 the audio to 64kbps mono before uploading — that fits about an hour of speech.
 It needs `ffmpeg` on your machine; audio files already under the cap skip the step.
 
-[`deploy/whisper/`](./hook_finder_blocks/deploy/whisper) builds the transcription
+[`deploy/whisper/`](./clip_scout_blocks/deploy/whisper) builds the transcription
 service. On a 15GB card it coexists with the 4B vision model: run vLLM at
 `--gpu-memory-utilization 0.80` and Whisper in `int8_float16`, which leaves both
 resident with room to spare.
 
 ```bash
-cd hook_finder_blocks/deploy/whisper
+cd clip_scout_blocks/deploy/whisper
 docker build -t whisper-svc .
 docker run -d --name whisper --restart unless-stopped \
   --runtime nvidia --gpus all \
@@ -105,9 +107,9 @@ docker run -d --name whisper --restart unless-stopped \
   -p 127.0.0.1:8001:8001 whisper-svc
 ```
 
-### hook_finder_blocks/hook-web
+### clip_scout_blocks/clip-web
 
-The consumer side of the hook finder, and the reason video is worth accepting at
+The consumer side of Clip Scout, and the reason video is worth accepting at
 all. Blocks caps a task input at 25MB and a screen recording is routinely twenty
 times that — but the picture was never the payload, so the browser strips the
 video track, downmixes to mono Opus and uploads only that. A 40-second 720p
@@ -117,14 +119,14 @@ The frames never leave the tab, which is what makes the results screen work:
 each pick plays against the footage it came from, seeked to its own timestamp.
 
 ```bash
-cd hook_finder_blocks/hook-web
+cd clip_scout_blocks/clip-web
 npm install
 cp .env.example .env.local  # the same BLOCKS_API_KEY the agent uses
 npm run dev                 # http://localhost:3000
 ```
 
 Encoding is WebCodecs plus a small Ogg muxer, so there is no ffmpeg.wasm payload
-and no server-side transcode — see [its README](./hook_finder_blocks/hook-web)
+and no server-side transcode — see [its README](./clip_scout_blocks/clip-web)
 for how a file becomes an upload. You can also record straight into the page,
 which skips the conversion entirely since `MediaRecorder` already produces Opus.
 
@@ -141,9 +143,9 @@ GPU between them.
 
 **Qwen3.5-4B** does both language jobs. It is a vision-language model
 (`image-text-to-text`), so `plant_doctor_blocks` sends it the photo directly,
-while `hook_finder_blocks` uses the same weights as a text model to rank a
+while `clip_scout_blocks` uses the same weights as a text model to rank a
 transcript. It is served here with a 16,384-token context, which is what bounds
-how much transcript the hook finder can weigh in one pass — and therefore why the
+how much transcript Clip Scout can weigh in one pass — and therefore why the
 handler trims a long recording from the middle rather than truncating the end.
 
 **Whisper large-v3-turbo** does the transcription, and the segment timings it
@@ -168,8 +170,8 @@ code change.
 - The Blocks CLI and an account — `blocks login --write-env`
 - For `plant_doctor_blocks`: a GPU with ~10GB of free VRAM, or any reachable
   OpenAI-compatible endpoint via `VLLM_URL`
-- For `hook_finder_blocks`: the same endpoint plus ~1.5GB more VRAM for Whisper,
-  and `ffmpeg` locally to extract audio before upload — `hook-web` needs neither,
+- For `clip_scout_blocks`: the same endpoint plus ~1.5GB more VRAM for Whisper,
+  and `ffmpeg` locally to extract audio before upload — `clip-web` needs neither,
   since the browser does the extraction
 
 ## A note on secrets
