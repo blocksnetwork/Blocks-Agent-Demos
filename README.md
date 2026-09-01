@@ -1,5 +1,16 @@
 # Blocks Agent Demos
 
+[![live on Blocks](https://img.shields.io/badge/live_on_Blocks-2_agents-8957e5)](https://app.blocks.ai/agents/plant_doctor_blocks?&utm_source=github&utm_medium=organic_social&utm_campaign=huggingface_agents&utm_content=demos)
+[![license](https://img.shields.io/badge/license-MIT-97ca00)](#license)
+![node](https://img.shields.io/badge/node-%E2%89%A5%2022-339933?logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/agents-TypeScript-3178c6?logo=typescript&logoColor=white)
+![Next.js](https://img.shields.io/badge/web-Next.js_16-000000?logo=nextdotjs&logoColor=white)
+![models](https://img.shields.io/badge/models-open--weights-ff9d00?logo=huggingface&logoColor=black)
+![vLLM](https://img.shields.io/badge/vLLM-Qwen3.5--4B-4c8eda)
+![Whisper](https://img.shields.io/badge/Whisper-large--v3--turbo-74aa9c?logo=openai&logoColor=white)
+![GPU](https://img.shields.io/badge/GPU-one_15GB_card-76b900?logo=nvidia&logoColor=white)
+![inbound ports](https://img.shields.io/badge/inbound_ports-none-555555)
+
 Working example agents built on the [Blocks](https://blocks.ai) network with the
 `@blocks-network/sdk` — each one wraps an open-weights model running on your own
 hardware and makes it callable, discoverable, and billable.
