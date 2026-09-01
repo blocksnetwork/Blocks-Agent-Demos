@@ -4,17 +4,19 @@ Working example agents built on the [Blocks](https://blocks.ai) network with the
 `@blocks-network/sdk` — each one wraps an open-weights model running on your own
 hardware and makes it callable, discoverable, and billable.
 
+**Try them live — no GPU or setup required:**
+
+- 🌱 [`plant_doctor_blocks`](https://app.blocks.ai/agents/plant_doctor_blocks?&utm_source=github&utm_medium=organic_social&utm_campaign=huggingface_agents&utm_content=demos) — send a plant photo, get a diagnosis
+- 🎬 [`hook_finder_blocks`](https://app.blocks.ai/agents/hook_finder_blocks?&utm_source=github&utm_medium=organic_social&utm_campaign=huggingface_agents&utm_content=demos) — send a recording, get your three strongest clips (the hosted Clip Scout agent)
+
+## Why Blocks
+
 Blocks is a communication and routing layer, not compute. Your agent runs on your
 infrastructure; Blocks connects it to the world but never takes custody of it. In
 practice that means your agent opens **one outbound connection** — no inbound
 ports, no DNS, no SSL certificates, no load balancer, and no auth system to build.
 
-## Demos
-
-Two of these agents are live on the Blocks network right now — no GPU required to try them:
-[`plant_doctor_blocks`](https://app.blocks.ai/agents/plant_doctor_blocks?&utm_source=github&utm_medium=organic_social&utm_campaign=huggingface_agents&utm_content=demos)
-and [`hook_finder_blocks`](https://app.blocks.ai/agents/hook_finder_blocks?&utm_source=github&utm_medium=organic_social&utm_campaign=huggingface_agents&utm_content=demos)
-(the hosted Clip Scout agent).
+## What's in this repo
 
 | Demo | What it does | Stack |
 |---|---|---|
@@ -23,6 +25,23 @@ and [`hook_finder_blocks`](https://app.blocks.ai/agents/hook_finder_blocks?&utm_
 | [`clip_scout_blocks`](./clip_scout_blocks) | Send a recording, get the three strongest short-form clips with timestamps, verbatim quotes, and captions | Blocks provider agent, TypeScript, faster-whisper + vLLM |
 | [`clip_scout_blocks/clip-web`](./clip_scout_blocks/clip-web) | The consumer side: drop audio or video, watch the run, play each pick against the footage | Next.js 16, React 19, Tailwind 4, WebCodecs |
 | [`design_blocks`](./design_blocks) | Claude Code / Cursor send a one-line brief and get back three rendered design comps with GPU-generated hero imagery, scored against a curated reference bank — winner expanded into theme.css, hero.png, og.png | Blocks provider agent, TypeScript, vLLM + Qwen3.5-4B, Sana 600M, CLIP scoring, satori/resvg |
+
+## Requirements
+
+- Node 22+ (the Blocks CLI needs Node ≥ 22 or Python ≥ 3.12)
+- The Blocks CLI and an account — `blocks login --write-env`
+- For `plant_doctor_blocks`: a GPU with ~10GB of free VRAM, or any reachable
+  OpenAI-compatible endpoint via `VLLM_URL`
+- For `clip_scout_blocks`: the same endpoint plus ~1.5GB more VRAM for Whisper,
+  and `ffmpeg` locally to extract audio before upload — `clip-web` needs neither,
+  since the browser does the extraction
+- For `design_blocks`: the same endpoint plus the CLIP embedding sidecar, which
+  runs on CPU and costs no VRAM at all; the coding-agent side needs only the
+  stock `@blocks-network/mcp-server` — the brief is plain text, nothing to install
+
+## Running the demos
+
+Each demo is self-contained — pick one and follow its steps.
 
 ### plant_doctor_blocks
 
@@ -200,19 +219,6 @@ Neither agent is bound to these choices. `VLLM_MODEL` and `WHISPER_MODEL` are
 read from the environment, and `VLLM_URL` can point at any OpenAI-compatible
 endpoint, so swapping in a larger model — or one you host elsewhere — needs no
 code change.
-
-## Requirements
-
-- Node 22+ (the Blocks CLI needs Node ≥ 22 or Python ≥ 3.12)
-- The Blocks CLI and an account — `blocks login --write-env`
-- For `plant_doctor_blocks`: a GPU with ~10GB of free VRAM, or any reachable
-  OpenAI-compatible endpoint via `VLLM_URL`
-- For `clip_scout_blocks`: the same endpoint plus ~1.5GB more VRAM for Whisper,
-  and `ffmpeg` locally to extract audio before upload — `clip-web` needs neither,
-  since the browser does the extraction
-- For `design_blocks`: the same endpoint plus the CLIP embedding sidecar, which
-  runs on CPU and costs no VRAM at all; the coding-agent side needs only the
-  stock `@blocks-network/mcp-server` — the brief is plain text, nothing to install
 
 ## A note on secrets
 
