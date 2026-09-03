@@ -1,3 +1,4 @@
+import { ANCHORS, FRAMES, Slot } from "./composition";
 import { PillButton } from "./PillButton";
 
 interface RawPanelProps {
@@ -5,26 +6,30 @@ interface RawPanelProps {
   onReset: () => void;
 }
 
+/** A reply that did not parse, shown verbatim in the treatment-plan frame. */
 export function RawPanel({ text, onReset }: RawPanelProps) {
   return (
-    <div className="flex animate-in flex-col gap-4 rounded-card bg-white px-8 py-7 shadow-card-softer">
-      <div className="flex flex-col gap-1.5">
-        <div className="text-[20px] font-semibold tracking-[-0.02em]">
-          Model response
-        </div>
-        <div className="text-[13px] leading-[1.55] text-body">
-          This reply did not follow the usual four sections, so it is shown
-          exactly as written.
-        </div>
-      </div>
+    <Slot
+      id="treatment-plan"
+      frame={FRAMES.treatmentPlan}
+      surface="solid"
+      anchor={{ target: "progress-stream", at: ANCHORS.streamFoot }}
+      className="treatment-slot"
+    >
+      <span className="label">Model response</span>
+      <h2 data-reveal className="panel-title">
+        Shown as written
+      </h2>
+      <p className="text-[13px] leading-[1.55]">
+        This reply did not follow the usual four sections, so it is shown
+        exactly as it came back.
+      </p>
 
-      <div className="rounded-panel bg-canvas p-5 text-[14px] leading-[1.7] whitespace-pre-wrap text-ink">
-        {text}
-      </div>
+      <div className="raw-box">{text}</div>
 
-      <div className="self-start">
+      <div className="mt-auto self-start pt-3">
         <PillButton onClick={onReset}>Diagnose another photo</PillButton>
       </div>
-    </div>
+    </Slot>
   );
 }

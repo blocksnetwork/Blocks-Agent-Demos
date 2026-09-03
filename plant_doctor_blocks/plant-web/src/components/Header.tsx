@@ -1,16 +1,17 @@
 import Link from "next/link";
 
+/** `nav-ghost` — the 66px navigation band across the top of the canvas. */
 export function Header() {
   return (
-    <header className="flex flex-wrap items-center justify-between gap-6">
+    <header className="flex h-full flex-wrap items-center justify-between gap-x-6 gap-y-1">
       <div className="flex items-center gap-3">
-        <div className="flex size-[38px] flex-none items-center justify-center rounded-full bg-[linear-gradient(150deg,#6fcf4b,#4caf50)]">
+        <span className="brand-mark">
           <svg
             width="20"
             height="20"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#ffffff"
+            stroke="currentColor"
             strokeWidth="1.7"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -20,23 +21,26 @@ export function Header() {
             <path d="M12 13c0-4.4 3.1-8 7-8 0 4.4-3.1 8-7 8Z" />
             <path d="M12 15c-3.3 0-6-2.7-6-6 3.3 0 6 2.7 6 6Z" />
           </svg>
-        </div>
+        </span>
         <div className="flex flex-col gap-px">
-          <div className="text-[17px] font-semibold tracking-[-0.02em]">
+          <div className="font-display text-[17px] font-bold tracking-[-0.01em]">
             Plant Doctor
           </div>
           <div className="text-[12px] text-body">One photo, one diagnosis.</div>
         </div>
       </div>
-      <div className="flex items-center gap-4 text-[12px] text-mute">
-        <span>JPEG, PNG or WebP · up to 10 MB</span>
-        <Link
-          href="/journal"
-          className="font-medium text-leaf-deep hover:text-leaf-dark"
-        >
-          Journal →
+
+      <nav className="flex items-center gap-6 text-[13px]" aria-label="Primary">
+        <span className="hidden text-mute md:inline">
+          JPEG, PNG or WebP · up to 10 MB
+        </span>
+        <span aria-current="page" className="font-semibold text-ink">
+          Diagnose
+        </span>
+        <Link href="/journal" className="nav-link">
+          <span className="underline-draw">Journal</span>
         </Link>
-      </div>
+      </nav>
     </header>
   );
 }

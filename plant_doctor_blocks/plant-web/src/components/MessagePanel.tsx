@@ -1,3 +1,4 @@
+import { ANCHORS, FRAMES, Slot } from "./composition";
 import { PillButton } from "./PillButton";
 
 export type MessageTone = "neutral" | "amber" | "coral";
@@ -12,12 +13,11 @@ export interface MessageSpec {
   secondary: string;
 }
 
-const TONES: Record<MessageTone, { circle: string; ink: string; dot: string }> =
-  {
-    neutral: { circle: "bg-chip", ink: "text-body", dot: "bg-body" },
-    amber: { circle: "bg-amber-bg", ink: "text-amber", dot: "bg-amber" },
-    coral: { circle: "bg-coral-bg", ink: "text-coral", dot: "bg-coral" },
-  };
+const TONES: Record<MessageTone, string> = {
+  neutral: "bg-chip text-body",
+  amber: "bg-amber-bg text-amber",
+  coral: "bg-coral-bg text-coral",
+};
 
 interface MessagePanelProps {
   message: MessageSpec;
@@ -25,55 +25,42 @@ interface MessagePanelProps {
   onSecondary: () => void;
 }
 
+/** A refusal, a queue notice or a failure, in the treatment-plan frame. */
 export function MessagePanel({
   message,
   onPrimary,
   onSecondary,
 }: MessagePanelProps) {
-  const tone = TONES[message.tone];
-
   return (
-    <div
+    <Slot
+      id="treatment-plan"
+      frame={FRAMES.treatmentPlan}
+      surface="solid"
+      anchor={{ target: "progress-stream", at: ANCHORS.streamFoot }}
+      className="treatment-slot"
       role="status"
-      className="flex animate-in flex-col gap-5 rounded-card bg-white px-8 py-9 shadow-card-soft"
     >
-      <div
-        className={`flex size-[76px] items-center justify-center rounded-full text-[26px] font-semibold ${tone.circle} ${tone.ink}`}
-      >
-        {message.glyph}
-      </div>
+      <div className={`message-glyph ${TONES[message.tone]}`}>{message.glyph}</div>
 
-      <div className="flex flex-col gap-2.5">
-        <div className="text-[26px] leading-[1.15] font-semibold tracking-[-0.03em] text-pretty">
-          {message.title}
-        </div>
-        <p className="max-w-[44ch] text-[15px] leading-[1.6] text-pretty text-body">
-          {message.body}
-        </p>
-      </div>
+      <h2 data-reveal className="panel-title">
+        {message.title}
+      </h2>
+      <p className="text-[14px] leading-[1.6] text-pretty">{message.body}</p>
 
       {message.list.length > 0 && (
-        <div className="flex flex-col gap-2">
+        <ul className="tip-list" data-reveal-group>
           {message.list.map((item) => (
-            <div
-              key={item}
-              className="flex items-start gap-[11px] text-[14px] leading-[1.55] text-ink"
-            >
-              <span
-                className={`mt-[7px] size-1.5 flex-none rounded-full ${tone.dot}`}
-              />
-              {item}
-            </div>
+            <li key={item}>{item}</li>
           ))}
-        </div>
+        </ul>
       )}
 
-      <div className="flex flex-wrap gap-2.5">
+      <div className="mt-auto flex flex-wrap gap-2.5 pt-3">
         <PillButton onClick={onPrimary}>{message.primary}</PillButton>
         <PillButton variant="muted" onClick={onSecondary}>
           {message.secondary}
         </PillButton>
       </div>
-    </div>
+    </Slot>
   );
 }

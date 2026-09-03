@@ -6,11 +6,20 @@ import { Alert, type AlertTone } from "@/components/Alert";
 import { DropZone } from "@/components/DropZone";
 import { EmptyPanel } from "@/components/EmptyPanel";
 import { Header } from "@/components/Header";
+import { LeaderLines } from "@/components/LeaderLines";
 import { MessagePanel } from "@/components/MessagePanel";
 import { PhotoCard } from "@/components/PhotoCard";
-import { ProgressPanel, type ProgressStage } from "@/components/ProgressPanel";
+import { ConfidencePin, EvidencePin } from "@/components/Pins";
+import {
+  FlowLine,
+  ProgressPanel,
+  StatusRing,
+  stepsUpTo,
+  type ProgressStage,
+} from "@/components/ProgressPanel";
 import { RawPanel } from "@/components/RawPanel";
 import { ResultPanel } from "@/components/ResultPanel";
+import { ANCHORS, FRAMES, Slot } from "@/components/composition";
 import { parseDiagnosis, type Diagnosis } from "@/lib/diagnosis";
 import {
   FAILURE_MESSAGES,
@@ -22,9 +31,23 @@ import {
 import { analyzePhoto, typeLabel, type Photo, type PhotoRejection } from "@/lib/photo";
 import type { FailureKind } from "@/lib/protocol";
 import { runDiagnosis } from "@/lib/diagnose-client";
+import { MotionKit } from "./journal/MotionKit";
+import kit from "../../design/design-kit.json";
+
+/* Built to design/design-blueprint.md from design_blocks task 9c964a89
+   ("Textured Botanical", faithful reference-transfer): one 1440 × 2722
+   canvas, the leaf subject as a top-left mass bleeding off two edges, a
+   credit strip crossing it, confidence and evidence pinned onto the photo
+   with live leader lines, and the flow line · headline · status ring ·
+   severity · treatment plan stacked down the left edge on plane 2. Below
+   760px the canvas linearises in DOM order. The diagnose flow — DropZone →
+   ProgressPanel → ResultPanel over /api/diagnose — is unchanged. */
 
 /** How long "Asking the model…" runs before we admit it is taking a while. */
 const SLOW_AFTER_SECONDS = 40;
+
+/** The hero is a licensed bank photograph; its credit stays visible near it. */
+const HERO_CREDIT = kit.winner.heroCredit;
 
 type Phase =
   | { name: "idle" }
@@ -90,6 +113,7 @@ export default function Home() {
   const photoRef = useRef<Photo | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const busyRef = useRef(false);
+  const canvasRef = useRef<HTMLElement | null>(null);
 
   const replacePhoto = useCallback((next: Photo | null) => {
     const previous = photoRef.current;
@@ -182,6 +206,15 @@ export default function Home() {
     return () => window.removeEventListener("paste", onPaste);
   }, [choose]);
 
+  // The progress and the diagnosis live in the lower-left frames of the
+  // composition; bring them into view when the agent starts and when it lands.
+  useEffect(() => {
+    if (phase.name !== "running" && phase.name !== "done") return;
+    document
+      .querySelector('[data-id="treatment-plan"]')
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [phase.name]);
+
   useEffect(
     () => () => {
       if (photoRef.current) URL.revokeObjectURL(photoRef.current.url);
@@ -203,49 +236,131 @@ export default function Home() {
         ? phase.stage
         : "uploading";
 
+  const resultShown =
+    phase.name === "done" && phase.diagnosis.kind === "parsed";
+
   return (
-    <div className="flex min-h-screen flex-col items-center px-8 pt-10 pb-24">
-      <div className="flex w-full max-w-[1100px] flex-col gap-8">
-        <Header />
+    <div className="doctor-theme min-h-screen">
+      <main ref={canvasRef} className="doctor-canvas" aria-label="Plant Doctor">
+        {/* nav-ghost — plane 2, full width, 66px. */}
+        <Slot id="nav-ghost" frame={FRAMES.navGhost} surface="outline" className="nav-slot">
+          <Header />
+        </Slot>
 
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(360px,1fr))] items-start gap-7">
-          <section className="flex min-w-0 flex-col gap-4">
+        {/* headline-in-flow — the vertical flow line carries the headline
+            down the left edge; display type fills the frame. */}
+        <Slot
+          id="headline-stream"
+          frame={FRAMES.headlineStream}
+          surface="solid"
+          anchor={{ target: "leafSubject", at: ANCHORS.leafFoot }}
+          className="headline-slot"
+        >
+          <h1 data-reveal>
+            Plant
+            <br />
+            Doctor
+          </h1>
+          <p>drop a photo of a sick plant and an AI agent names what is wrong</p>
+        </Slot>
+
+        {/* leafSubject — the focal mass, plane 1, bleeding off the top and
+            left. The hero cutout fills the frame; the on-canvas part is the
+            stage where the drop zone and then the uploaded photo live, so
+            the pins attach to real imagery. */}
+        <Slot id="leafSubject" frame={FRAMES.leafSubject} className="subject-slot">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/doctor-hero.png"
+            alt=""
+            className="subject-hero"
+            width={1024}
+            height={1024}
+          />
+          <div className="subject-stage">
             {alert && (
-              <Alert tone={alert.tone} title={alert.title} body={alert.body} />
+              <div className="stage-alert">
+                <Alert tone={alert.tone} title={alert.title} body={alert.body} />
+              </div>
             )}
 
-            {photo ? (
-              <PhotoCard
-                photo={photo}
-                busy={busy}
-                canRemove={phase.name === "ready"}
-                showDiagnose={phase.name === "ready"}
-                onRemove={reset}
-                onDiagnose={() => void run()}
-              />
-            ) : (
-              <DropZone
-                dragging={dragging}
-                onFiles={(files) => void choose(files)}
-                onDraggingChange={setDragging}
-              />
-            )}
-          </section>
+            <div className="subject-media" data-id="subject-photo">
+              {photo ? (
+                <PhotoCard
+                  photo={photo}
+                  busy={busy}
+                  canRemove={phase.name === "ready"}
+                  showDiagnose={phase.name === "ready"}
+                  onRemove={reset}
+                  onDiagnose={() => void run()}
+                />
+              ) : (
+                <DropZone
+                  dragging={dragging}
+                  onFiles={(files) => void choose(files)}
+                  onDraggingChange={setDragging}
+                />
+              )}
+            </div>
+          </div>
+        </Slot>
 
-          <section aria-live="polite" className="flex min-w-0 flex-col gap-4">
-            <RightPanel
-              phase={phase}
-              stage={stage}
-              seconds={seconds}
-              onRetry={() => void run()}
-              onReset={reset}
-              onKeepWaiting={() =>
-                setPhase({ name: "running", stage: "uploading" })
-              }
-            />
-          </section>
-        </div>
-      </div>
+        {/* footer-text — the strip that crosses the leaf; carries the hero
+            credit so it stays visible beside the image it belongs to. */}
+        <Slot id="footer-line" frame={FRAMES.footerLine} surface="solid" className="credit-slot">
+          <span className="font-display font-semibold text-ink">Plant Doctor</span>
+          <span>Clinical diagnosis guidance from an agent on the Blocks network.</span>
+          <span aria-hidden="true">·</span>
+          <span>
+            Leaf: <span dangerouslySetInnerHTML={{ __html: HERO_CREDIT }} />
+          </span>
+        </Slot>
+
+        {/* Floating sticker at plane 3, on the leaf's right edge. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/stickers/doctor-mini.svg"
+          alt=""
+          width={250}
+          height={84}
+          data-float
+          data-float-rotate="-3deg"
+          className="sticker"
+          style={{ left: "61%", top: "17.6%", width: "17.4%", zIndex: 33 }}
+        />
+
+        <RightPanel
+          phase={phase}
+          stage={stage}
+          seconds={seconds}
+          photoUrl={photo?.url ?? null}
+          onRetry={() => void run()}
+          onReset={reset}
+          onKeepWaiting={() =>
+            setPhase({ name: "running", stage: "uploading" })
+          }
+        />
+
+        {!resultShown && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src="/stickers/doctor-stat.svg"
+            alt=""
+            width={220}
+            height={96}
+            data-float
+            data-float-rotate="3deg"
+            className="sticker"
+            style={{ left: "24%", top: "76.5%", width: "15.3%", zIndex: 35 }}
+          />
+        )}
+
+        <LeaderLines canvasRef={canvasRef} />
+      </main>
+
+      {/* The journal's port of design-motion.js; keyed on the phase so reveals
+          and float phases re-wire whenever a new frame mounts. */}
+      <MotionKit key={`${phase.name}-${photo ? "photo" : "empty"}`} />
     </div>
   );
 }
@@ -254,30 +369,97 @@ interface RightPanelProps {
   phase: Phase;
   stage: ProgressStage;
   seconds: number;
+  photoUrl: string | null;
   onRetry: () => void;
   onReset: () => void;
   onKeepWaiting: () => void;
 }
 
+/** `severity-badge` before there is a diagnosis to put in it. */
+function SeverityNote({ title, body }: { title: string; body: string }) {
+  return (
+    <Slot
+      id="severity-badge"
+      frame={FRAMES.severityBadge}
+      surface="solid"
+      anchor={{ target: "progress-stream", at: ANCHORS.streamFoot }}
+      className="severity-slot"
+    >
+      <span className="label">Diagnosis</span>
+      <h2 data-reveal className="diagnosis-title">
+        {title}
+      </h2>
+      <div className="severity-note">{body}</div>
+    </Slot>
+  );
+}
+
+/**
+ * Everything that follows the agent: the flow line, the status ring, the two
+ * pins and the severity and treatment frames — each phase fills the same
+ * frames with what it has.
+ */
 function RightPanel({
   phase,
   stage,
   seconds,
+  photoUrl,
   onRetry,
   onReset,
   onKeepWaiting,
 }: RightPanelProps) {
+  // The pins always point at the on-canvas subject: the drop zone before a
+  // photo exists, the photo itself afterwards.
+  const target = "subject-photo";
+  const confidenceAt = ANCHORS.confidenceOnPhoto;
+  const anatomyAt = ANCHORS.anatomyOnPhoto;
+
+  const pins = (value: string, caption: string) => (
+    <>
+      <ConfidencePin
+        value={value}
+        caption={caption}
+        anchor={{ target, at: confidenceAt }}
+      />
+      <EvidencePin
+        imageUrl={photoUrl ?? "/doctor-hero.png"}
+        value="Evidence"
+        caption="pinned once diagnosed"
+        fraction={0}
+        anchor={{ target, at: anatomyAt }}
+      />
+    </>
+  );
+
   if (phase.name === "running") {
-    return <ProgressPanel stage={stage} seconds={seconds} onRetry={onRetry} />;
+    return (
+      <>
+        {pins("…", "diagnosing")}
+        <SeverityNote
+          title="Diagnosing…"
+          body="The agent is reading your photo. The name, the level and the plan land here."
+        />
+        <ProgressPanel stage={stage} seconds={seconds} onRetry={onRetry} />
+      </>
+    );
   }
 
   if (phase.name === "queued") {
     return (
-      <MessagePanel
-        message={QUEUED_MESSAGE}
-        onPrimary={onKeepWaiting}
-        onSecondary={onReset}
-      />
+      <>
+        <FlowLine steps={stepsUpTo(1, "active")} />
+        <StatusRing value="Queued" fraction={0.4} />
+        {pins("…", "queued")}
+        <SeverityNote
+          title="Waiting in line"
+          body="The model finishes the photo ahead of yours first."
+        />
+        <MessagePanel
+          message={QUEUED_MESSAGE}
+          onPrimary={onKeepWaiting}
+          onSecondary={onReset}
+        />
+      </>
     );
   }
 
@@ -286,52 +468,129 @@ function RightPanel({
     // so it stays in the progress panel with the second step marked failed.
     if (phase.kind === "timeout") {
       return (
-        <ProgressPanel stage="timeout" seconds={seconds} onRetry={onRetry} />
+        <>
+          {pins("—", "no reply")}
+          <SeverityNote
+            title="No diagnosis yet"
+            body="The model ran out of time. Send the same photo again."
+          />
+          <ProgressPanel stage="timeout" seconds={seconds} onRetry={onRetry} />
+        </>
       );
     }
     return (
-      <MessagePanel
-        message={FAILURE_MESSAGES[phase.kind]}
-        onPrimary={onRetry}
-        onSecondary={onReset}
-      />
+      <>
+        <FlowLine steps={stepsUpTo(2, "failed")} />
+        <StatusRing value="Failed" fraction={0.62} />
+        {pins("—", "no reply")}
+        <SeverityNote
+          title="No diagnosis yet"
+          body="The request did not make it back. Retry with the photo already loaded."
+        />
+        <MessagePanel
+          message={FAILURE_MESSAGES[phase.kind]}
+          onPrimary={onRetry}
+          onSecondary={onReset}
+        />
+      </>
     );
   }
 
   if (phase.name === "done") {
     const { diagnosis } = phase;
+    const finished = (
+      <>
+        <FlowLine steps={stepsUpTo(4)} />
+        <StatusRing value="Done" fraction={1} />
+      </>
+    );
 
     switch (diagnosis.kind) {
       case "parsed":
-        return <ResultPanel result={diagnosis} onReset={onReset} />;
+        return (
+          <>
+            {finished}
+            <ResultPanel result={diagnosis} onReset={onReset} photoUrl={photoUrl} />
+          </>
+        );
       case "raw":
-        return <RawPanel text={diagnosis.text} onReset={onReset} />;
+        return (
+          <>
+            {finished}
+            {pins("n/a", "reply did not parse")}
+            <SeverityNote
+              title="Unstructured reply"
+              body="The model answered, but not in its usual four sections."
+            />
+            <RawPanel text={diagnosis.text} onReset={onReset} />
+          </>
+        );
       case "noplant":
         return (
-          <MessagePanel
-            message={noPlantMessage(diagnosis)}
-            onPrimary={onReset}
-            onSecondary={onReset}
-          />
+          <>
+            {finished}
+            {pins("—", "nothing to rate")}
+            <SeverityNote
+              title="No plant found"
+              body="The model saw no plant to diagnose in this photo."
+            />
+            <MessagePanel
+              message={noPlantMessage(diagnosis)}
+              onPrimary={onReset}
+              onSecondary={onReset}
+            />
+          </>
         );
       case "notdiagnosable":
         return (
-          <MessagePanel
-            message={notDiagnosableMessage(diagnosis)}
-            onPrimary={onReset}
-            onSecondary={onReset}
-          />
+          <>
+            {finished}
+            {pins("—", "nothing to rate")}
+            <SeverityNote
+              title="Not diagnosable"
+              body="The photo did not carry enough detail for a diagnosis."
+            />
+            <MessagePanel
+              message={notDiagnosableMessage(diagnosis)}
+              onPrimary={onReset}
+              onSecondary={onReset}
+            />
+          </>
         );
       case "unreadable":
         return (
-          <MessagePanel
-            message={unreadableMessage(diagnosis.text)}
-            onPrimary={onRetry}
-            onSecondary={onReset}
-          />
+          <>
+            {finished}
+            {pins("—", "nothing to rate")}
+            <SeverityNote
+              title="Photo not received"
+              body="The agent could not open the image it was sent."
+            />
+            <MessagePanel
+              message={unreadableMessage(diagnosis.text)}
+              onPrimary={onRetry}
+              onSecondary={onReset}
+            />
+          </>
         );
     }
   }
 
-  return <EmptyPanel />;
+  const ready = phase.name === "ready";
+  return (
+    <>
+      <FlowLine steps={stepsUpTo(0, ready ? "active" : "todo")} />
+      <StatusRing value={ready ? "Ready" : "Idle"} fraction={ready ? 0.25 : 0.06} />
+      {pins("—", ready ? "press Diagnose" : "after diagnosis")}
+      <SeverityNote
+        title={ready ? "Ready when you are" : "Awaiting a photo"}
+        body={
+          ready
+            ? "Press Diagnose above the photo. The name, the level and the plan land here."
+            : "Drop one photo of the plant. The diagnosis name and its level land here."
+        }
+      />
+      <EmptyPanel />
+    </>
+  );
 }

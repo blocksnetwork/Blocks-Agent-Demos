@@ -1,22 +1,20 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
 import "./globals.css";
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import "./doctor-theme.css";
+import "./doctor-motion.css";
 
 export const metadata: Metadata = {
   title: "Plant Doctor — One photo, one diagnosis",
   description:
     "Upload one photo of a plant and get the likely problem, the evidence behind it, and the steps to fix it.",
+  openGraph: {
+    images: ["/doctor-og.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${outfit.variable} h-full antialiased`}>
+    <html lang="en" className="h-full antialiased">
       <body className="min-h-full font-sans">{children}</body>
     </html>
   );

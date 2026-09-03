@@ -1,122 +1,163 @@
 import { useState } from "react";
 
-import { confidenceBadge, type ParsedDiagnosis, type ResultLevel } from "@/lib/diagnosis";
+import {
+  confidenceBadge,
+  type Confidence,
+  type ParsedDiagnosis,
+  type ResultLevel,
+} from "@/lib/diagnosis";
+import { ANCHORS, FRAMES, Slot } from "./composition";
+import { ConfidencePin, EvidencePin } from "./Pins";
 import { PillButton } from "./PillButton";
 
-const TONES: Record<ResultLevel, { hero: string; badge: string }> = {
-  good: {
-    hero: "bg-[linear-gradient(160deg,#eaf7e3,#f6fcf2)]",
-    badge: "bg-leaf/14 text-leaf-dark",
-  },
-  ok: { hero: "bg-white", badge: "bg-leaf/14 text-leaf-dark" },
-  warn: { hero: "bg-white", badge: "bg-amber-bg text-amber" },
+const LEVELS: Record<
+  ResultLevel,
+  { word: string; urgency: string; tone: string }
+> = {
+  good: { word: "Healthy", urgency: "Nothing urgent", tone: "level-good" },
+  ok: { word: "Manageable", urgency: "Start the plan this week", tone: "level-ok" },
+  warn: { word: "Watch closely", urgency: "Act now, then re-check", tone: "level-warn" },
 };
+
+const RING: Record<Confidence, number> = { high: 0.92, medium: 0.62, low: 0.34 };
+
+function CheckIcon() {
+  return (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12.5l4.5 4.5L19 7" />
+    </svg>
+  );
+}
 
 interface ResultPanelProps {
   result: ParsedDiagnosis;
   onReset: () => void;
+  /** The uploaded photo, so the evidence lens magnifies it and the pins attach to it. */
+  photoUrl?: string | null;
 }
 
-export function ResultPanel({ result, onReset }: ResultPanelProps) {
+/**
+ * The diagnosis, laid across the blueprint's frames: confidence and evidence
+ * pinned onto the photo, the diagnosis name and level in `severity-badge`,
+ * the why and the numbered plan in `treatment-plan`.
+ */
+export function ResultPanel({ result, onReset, photoUrl = null }: ResultPanelProps) {
   const [done, setDone] = useState<Record<number, boolean>>({});
-  const tone = TONES[result.level];
+  const level = LEVELS[result.level];
   const badge = confidenceBadge(result.confidence);
+  const confidenceWord = result.confidence
+    ? result.confidence[0].toUpperCase() + result.confidence.slice(1)
+    : "n/a";
+  const target = photoUrl ? "subject-photo" : "leafSubject";
 
   return (
-    <div className="flex animate-in-slow flex-col gap-4">
-      <div
-        className={`flex flex-col gap-[18px] rounded-card p-8 shadow-card-soft ${tone.hero}`}
+    <>
+      <ConfidencePin
+        value={confidenceWord}
+        caption={badge ? "the model's own rating" : "not stated by the model"}
+        anchor={{
+          target,
+          at: photoUrl ? ANCHORS.confidenceOnPhoto : ANCHORS.confidenceOnLeaf,
+        }}
+      />
+      <EvidencePin
+        imageUrl={photoUrl}
+        value="Evidence"
+        caption="pinned to the photo"
+        fraction={RING[result.confidence ?? "low"]}
+        anchor={{
+          target,
+          at: photoUrl ? ANCHORS.anatomyOnPhoto : ANCHORS.anatomyOnLeaf,
+        }}
+      />
+
+      <Slot
+        id="severity-badge"
+        frame={FRAMES.severityBadge}
+        surface="solid"
+        anchor={{ target: "progress-stream", at: ANCHORS.streamFoot }}
+        className={`severity-slot ${level.tone}`}
+        role="status"
+        ariaLabel="Diagnosis"
       >
-        <div className="flex flex-wrap items-center gap-2.5">
-          <span className="text-[11px] font-semibold tracking-[0.12em] text-body">
-            DIAGNOSIS
-          </span>
-          {badge && (
-            <span
-              className={`inline-flex items-center gap-2 rounded-full px-[13px] py-1.5 text-[12px] font-semibold ${tone.badge}`}
-            >
-              <span className="size-1.5 rounded-full bg-current" />
-              {badge}
-            </span>
-          )}
-        </div>
-
-        <div className="text-[38px] leading-[1.05] font-bold tracking-[-0.04em] text-pretty">
+        <span className="label">Diagnosis</span>
+        <h2 data-reveal className="diagnosis-title">
           {result.diagnosis}
+        </h2>
+        <div className="severity-row">
+          <span className="value">{level.word}</span>
+          <span className="severity-urgency">{level.urgency}</span>
         </div>
-
         {result.confidenceNote && (
-          <p className="max-w-[46ch] text-[14px] leading-[1.6] text-pretty text-body">
-            {result.confidenceNote}
-          </p>
+          <div className="severity-note">{result.confidenceNote}</div>
         )}
-      </div>
+      </Slot>
 
-      <div className="flex flex-col gap-3 rounded-card bg-white px-8 py-7 shadow-card-softer">
-        <div className="text-[11px] font-semibold tracking-[0.12em] text-mute">
-          WHY
-        </div>
-        <p className="text-[15px] leading-[1.65] text-pretty text-ink">
-          {result.why}
-        </p>
-      </div>
+      <Slot
+        id="treatment-plan"
+        frame={FRAMES.treatmentPlan}
+        surface="solid"
+        anchor={{ target: "progress-stream", at: ANCHORS.streamFoot }}
+        className="treatment-slot"
+        ariaLabel="Evidence and treatment plan"
+      >
+        <span className="label">Why</span>
+        <div className="why-text">{result.why}</div>
 
-      {result.fix.length > 0 && (
-        <div className="flex flex-col gap-4 rounded-card bg-white px-8 pt-7 pb-6 shadow-card-softer">
-          <div className="flex items-baseline justify-between gap-3">
-            <div className="text-[11px] font-semibold tracking-[0.12em] text-mute">
-              FIX
+        {result.fix.length > 0 && (
+          <>
+            <div className="plan-head">
+              <span className="label">Treatment plan</span>
+              <span className="text-[12px] text-mute">
+                {result.fix.length} {result.fix.length === 1 ? "step" : "steps"}
+              </span>
             </div>
-            <div className="text-[12px] text-mute">
-              {result.fix.length} {result.fix.length === 1 ? "step" : "steps"}
-            </div>
-          </div>
 
-          <ol className="flex list-none flex-col gap-1 p-0">
-            {result.fix.map((step, index) => {
-              const checked = Boolean(done[index]);
+            <ol className="fix-list" data-reveal-group>
+              {result.fix.map((step, index) => {
+                const checked = Boolean(done[index]);
 
-              return (
-                <li key={step}>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setDone((current) => ({
-                        ...current,
-                        [index]: !current[index],
-                      }))
-                    }
-                    className={`flex w-full cursor-pointer items-start gap-3.5 py-3 text-left ${
-                      index === 0 ? "" : "border-t border-line"
-                    }`}
-                  >
-                    <span
-                      className={`flex size-[26px] flex-none items-center justify-center rounded-full text-[13px] font-semibold ${
-                        checked ? "bg-leaf text-white" : "bg-chip text-body"
-                      }`}
+                return (
+                  <li key={step}>
+                    <button
+                      type="button"
+                      aria-pressed={checked}
+                      onClick={() =>
+                        setDone((current) => ({
+                          ...current,
+                          [index]: !current[index],
+                        }))
+                      }
+                      className="fix-step"
                     >
-                      {checked ? "✓" : index + 1}
-                    </span>
-                    <span
-                      className={`text-[15px] leading-[1.55] ${
-                        checked ? "text-mute line-through" : "text-ink"
-                      }`}
-                    >
-                      {step}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
+                      <span className="fix-num">
+                        {checked ? <CheckIcon /> : index + 1}
+                      </span>
+                      <span className="fix-text">{step}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+          </>
+        )}
+
+        <div className="mt-auto self-start pt-3">
+          <PillButton variant="white" onClick={onReset}>
+            Diagnose another photo
+          </PillButton>
         </div>
-      )}
-
-      <div className="self-start">
-        <PillButton variant="white" onClick={onReset}>
-          Diagnose another photo
-        </PillButton>
-      </div>
-    </div>
+      </Slot>
+    </>
   );
 }

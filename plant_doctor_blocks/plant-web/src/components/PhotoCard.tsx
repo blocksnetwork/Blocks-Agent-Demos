@@ -18,12 +18,11 @@ function frameNote(photo: Photo): string | null {
   return null;
 }
 
-function frameHeight(photo: Photo): string {
-  if (photo.extremeAspect) return "520px";
-  if (photo.tiny) return "210px";
-  return "340px";
-}
-
+/**
+ * The uploaded photo, filling the subject stage so the pins attach to it.
+ * The action bar sits on top because the blueprint's annotations and the
+ * treatment plan overlap the bottom of the subject.
+ */
 export function PhotoCard({
   photo,
   busy,
@@ -35,60 +34,52 @@ export function PhotoCard({
   const note = frameNote(photo);
 
   return (
-    <div className="flex animate-in flex-col gap-[18px] rounded-card bg-white p-5 shadow-card">
-      <div
-        className={`relative flex min-h-[300px] items-center justify-center overflow-hidden rounded-frame ${
-          photo.hasAlpha ? "checkerboard" : "bg-mint"
-        }`}
-      >
+    <div className="photo-card">
+      <div className="photo-bar">
+        <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
+          <div className="truncate text-[14px] font-medium text-ink">
+            {photo.name}
+          </div>
+          <div className="text-[12px] text-mute">{photo.meta}</div>
+        </div>
+
+        {canRemove && (
+          <button type="button" onClick={onRemove} className="btn btn-muted">
+            Remove
+          </button>
+        )}
+
+        {showDiagnose && (
+          <button type="button" onClick={onDiagnose} className="btn">
+            Diagnose
+          </button>
+        )}
+      </div>
+
+      <div className={`photo-frame ${photo.hasAlpha ? "checkerboard" : ""}`}>
         {/* A blob URL from the user's own disk — nothing for next/image to do. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo.url}
           alt="The plant photo you uploaded, awaiting diagnosis"
-          style={{ height: frameHeight(photo) }}
-          className="w-full object-contain"
+          style={{ objectFit: photo.tiny ? "none" : "cover" }}
+          className="photo-img"
         />
 
         {busy && (
-          <div className="absolute inset-0 flex items-center justify-center bg-canvas/72">
-            <span className="size-[38px] animate-spin-ring rounded-full border-[3px] border-leaf/22 border-t-leaf" />
+          <div className="photo-busy">
+            <span className="chip chip-live" data-float>
+              Diagnosing…
+            </span>
           </div>
         )}
 
         {note && (
-          <div className="absolute bottom-3.5 left-3.5 rounded-full bg-white/92 px-[13px] py-[7px] text-[12px] font-medium text-ink shadow-pill">
-            {note}
+          <div className="photo-note">
+            <span className="chip">{note}</span>
           </div>
         )}
       </div>
-
-      <div className="flex flex-wrap items-center gap-3.5">
-        <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-          <div className="truncate text-[15px] font-medium">{photo.name}</div>
-          <div className="text-[12px] text-mute">{photo.meta}</div>
-        </div>
-
-        {canRemove && (
-          <button
-            type="button"
-            onClick={onRemove}
-            className="cursor-pointer rounded-full bg-chip px-[18px] py-[11px] text-[14px] font-medium text-body transition-colors hover:bg-chip-hover hover:text-ink"
-          >
-            Remove
-          </button>
-        )}
-      </div>
-
-      {showDiagnose && (
-        <button
-          type="button"
-          onClick={onDiagnose}
-          className="w-full cursor-pointer rounded-full bg-[linear-gradient(150deg,#6fcf4b,#4caf50)] p-4 text-[16px] font-semibold text-white shadow-leaf-lg transition-shadow hover:shadow-leaf-hover"
-        >
-          Diagnose
-        </button>
-      )}
     </div>
   );
 }

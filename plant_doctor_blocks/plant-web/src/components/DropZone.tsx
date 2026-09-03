@@ -6,6 +6,7 @@ interface DropZoneProps {
   onDraggingChange: (dragging: boolean) => void;
 }
 
+/** The glass drop panel that fills the subject stage until a photo lands. */
 export function DropZone({
   dragging,
   onFiles,
@@ -26,22 +27,16 @@ export function DropZone({
         onDraggingChange(false);
         onFiles(event.dataTransfer.files);
       }}
-      className={`relative block cursor-pointer rounded-card transition-[background-color,box-shadow] duration-[180ms] ease-out ${
-        dragging ? "bg-mint shadow-drop-active" : "bg-white shadow-card-soft"
-      }`}
+      className={`drop-zone ${dragging ? "is-dragging" : ""}`}
     >
-      <div className="flex flex-col items-center gap-[22px] px-8 py-14 text-center">
-        <div
-          className={`flex size-[132px] items-center justify-center rounded-full transition-colors duration-[180ms] ${
-            dragging ? "bg-white" : "bg-pale"
-          }`}
-        >
+      <div className="drop-inner">
+        <div className="drop-icon">
           <svg
             width="46"
             height="46"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#4caf50"
+            stroke="currentColor"
             strokeWidth="1.4"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -52,20 +47,16 @@ export function DropZone({
           </svg>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <div className="text-[26px] leading-[1.15] font-semibold tracking-[-0.03em]">
-            {dragging ? "Drop it here" : "Show me the plant"}
-          </div>
-          <div className="max-w-[34ch] text-[14px] leading-[1.55] text-body">
-            {dragging
-              ? "Release to load this photo."
-              : "One clear photo in daylight, the whole plant in frame. Nothing else to fill in."}
-          </div>
-        </div>
+        <h1 data-reveal className="drop-title">
+          {dragging ? "Drop it here" : "Show me the plant"}
+        </h1>
+        <p className="drop-body">
+          {dragging
+            ? "Release to load this photo."
+            : "One clear photo in daylight, the whole plant in frame. Nothing else to fill in."}
+        </p>
 
-        <span className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(150deg,#6fcf4b,#4caf50)] px-[26px] py-[13px] text-[15px] font-semibold text-white shadow-leaf">
-          Choose a photo
-        </span>
+        <span className="btn">Choose a photo</span>
 
         <span className="text-[12px] text-mute">
           Or drag one in, or paste from the clipboard

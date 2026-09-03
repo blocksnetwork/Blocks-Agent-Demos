@@ -1,11 +1,10 @@
 type Variant = "primary" | "muted" | "white";
 
+/* The kit styles `.btn` (pill radius, primary fill); variants are its tints. */
 const VARIANTS: Record<Variant, string> = {
-  primary:
-    "bg-[linear-gradient(150deg,#6fcf4b,#4caf50)] text-white font-semibold shadow-leaf-sm hover:shadow-leaf-hover",
-  muted: "bg-chip text-ink font-medium hover:bg-chip-hover",
-  white:
-    "bg-white text-leaf-deep font-semibold shadow-ghost hover:bg-mint",
+  primary: "btn",
+  muted: "btn btn-muted",
+  white: "btn btn-white",
 };
 
 interface PillButtonProps {
@@ -20,11 +19,7 @@ export function PillButton({
   variant = "primary",
 }: PillButtonProps) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`cursor-pointer rounded-full px-6 py-3.5 text-[15px] transition-shadow ${VARIANTS[variant]}`}
-    >
+    <button type="button" onClick={onClick} className={VARIANTS[variant]}>
       {children}
     </button>
   );
