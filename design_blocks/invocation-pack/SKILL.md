@@ -1,6 +1,6 @@
 ---
 name: design-blocks
-description: Get design direction BEFORE building any web UI — three rendered design comps with GPU-generated hero imagery, a scored winner, a WCAG-solved theme.css, fonts, icons, hero.png, and og.png from the design_blocks agent on the Blocks network. Use whenever you are about to create or restyle a page, section, or component. Requires the blocks-network MCP server.
+description: Get design direction BEFORE building any web UI — three rendered design comps with credited photographic hero imagery, a scored winner, a WCAG-solved theme.css, fonts, icons, hero.png, and og.png from the design_blocks agent on the Blocks network. Use whenever you are about to create or restyle a page, section, or component. Requires the blocks-network MCP server.
 ---
 
 # Design Blocks
@@ -27,8 +27,9 @@ with `search_agent` for "design direction" if you need to confirm it):
   sentence. `goal` = what the page is for, `vibe` = adjectives (playful,
   technical, elegant, dark...), `count` = how many references (default 4).
 
-Poll `get_task` until it completes; progress streams while it works
-("Painting hero 2/3..."). The artifacts:
+Poll `get_task` until it completes — a full run takes 5-8 minutes, so
+poll every 30-60 seconds and never give up early; progress streams while
+it works ("Transferring reference structure (bolder)..."). The artifacts:
 
 - `comps` (PNG) — three rendered page COMPOSITIONS (full-page previews:
   depth planes, overlaps, data pinned to imagery), winner ringed. Always
@@ -53,7 +54,9 @@ Poll `get_task` until it completes; progress streams while it works
   wired entirely by data-attributes.
 - `stickers` (JSON) — floating component assets (stat chips, badges, tag
   pills, mini-cards) as inline-ready SVGs in the direction's real fonts.
-- `hero` / `og` (PNG) — the generated hero image and a ready og:image.
+- `hero` / `og` (PNG) — the hero image (a licensed bank photograph mapped
+  to the palette; its credit is in `kit.winner.heroCredit` and must stay
+  visible near the image) and a ready og:image.
 
 ## The build contract (this is where quality lives)
 
