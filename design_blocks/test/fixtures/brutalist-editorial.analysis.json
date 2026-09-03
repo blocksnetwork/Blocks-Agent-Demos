@@ -1,0 +1,54 @@
+{
+  "summary": "brutalist editorial spread where monumental display type is the dominant object, overlapping a duotone photograph",
+  "composition": {
+    "dominant_region": "upper left two thirds, occupied by a single enormous word",
+    "masses": [
+      { "what": "monumental display word", "area": "dominant", "bbox": { "x": -6, "y": 6, "w": 90, "h": 38 } },
+      { "what": "duotone photograph", "area": "large", "bbox": { "x": 48, "y": 18, "w": 50, "h": 52 } },
+      { "what": "offer block", "area": "medium", "bbox": { "x": 8, "y": 62, "w": 36, "h": 26 } },
+      { "what": "vertical text rail", "area": "small", "bbox": { "x": 94, "y": 0, "w": 6, "h": 100 } }
+    ],
+    "symmetry": "strongly-asymmetric",
+    "focal_point": "the giant word, which reads before the photo",
+    "reading_path": "the word first, then down its overlap into the photo, then to the offer block; lower right stays empty",
+    "grid": "rigid rectilinear blocks, deliberately misaligned against each other; no cards anywhere"
+  },
+  "layering": {
+    "planes": 3,
+    "overlaps": [{ "front": "monumental display word", "back": "duotone photograph", "degree": "heavy" }],
+    "container_breaks": ["display word bleeds off the left canvas edge"],
+    "floating": ["vertical text rail"]
+  },
+  "imagery": [
+    {
+      "subject": "duotone portrait photograph",
+      "role": "contained-illustration",
+      "integration": "the display type overlaps it heavily; it never sits in a rounded frame"
+    }
+  ],
+  "data_display": [],
+  "geometry": { "corners": "sharp, zero radius", "shapes": "hard rectangles only", "diagonals": false, "organic": false },
+  "density": { "overall": "sparse", "gradient": "concentrated upper left, deliberate emptiness lower right" },
+  "signature_patterns": [
+    {
+      "observation": "one word set at roughly 220px spans 90% of the width and overlaps the photo",
+      "principle": "monumental display type is the dominant compositional object, overlapping imagery rather than sitting above it"
+    },
+    {
+      "observation": "the display word starts before the left canvas edge",
+      "principle": "let the dominant object bleed off the canvas edge"
+    },
+    {
+      "observation": "a thin line of type runs vertically along the full right edge",
+      "principle": "set one strip of secondary text vertically along a canvas edge"
+    },
+    {
+      "observation": "the offer block's left edge sits 40px off the photo's left edge, clearly on purpose",
+      "principle": "misalign neighboring blocks deliberately; alignment tension replaces decoration"
+    },
+    {
+      "observation": "there is not a single card, border radius, or shadow on the page",
+      "principle": "avoid conventional card components entirely; bare blocks and whitespace carry the hierarchy"
+    }
+  ]
+}

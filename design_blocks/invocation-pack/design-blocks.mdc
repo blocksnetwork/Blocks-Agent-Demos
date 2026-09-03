@@ -1,0 +1,35 @@
+---
+description: Design Blocks — get design direction from the Blocks network BEFORE building or restyling any web UI. Direction first, then build to it.
+globs: ["**/*.tsx", "**/*.jsx", "**/*.vue", "**/*.svelte", "**/*.html", "**/*.css"]
+alwaysApply: false
+---
+
+# Design Blocks (Blocks network agent)
+
+Before building a new page, screen, or component — or whenever choosing
+colors, fonts, or layout — get direction from the `design_blocks` agent via
+the blocks-network MCP server:
+
+1. Call the `send_task` MCP tool: agent `design_blocks`, text input `brief`
+   = JSON `{goal, vibe, framework, count}` or a plain sentence describing
+   what you are about to build and how it should feel.
+
+2. Poll `get_task` until complete. You get `comps` (three rendered comps,
+   winner ringed — SHOW THIS to the user), `blueprint` (THE PAGE:
+   section-by-section layout with exact sizes/overlaps/rotations),
+   `theme_css` + `motion_css` + `motion_js` (styling and micro-animation
+   kit), `stickers` (floating SVG components), `kit`, `hero`/`og` PNGs.
+
+3. THE BLUEPRINT IS THE PAGE — build it section by section with its exact
+   numbers; it outranks your layout habits. Link theme, then motion css,
+   then motion js (defer). Inline sticker SVGs as the blueprint's floating
+   elements with data-float; add data-reveal / data-reveal-group where the
+   blueprint says. Save hero/og into public/ and wire them.
+
+4. Never: a centered gradient-card hero unless the blueprint says so,
+   three identical boxes in a row, shrunken display type, ad-hoc
+   keyframes, or emoji as icons. The motion kit is the only animation
+   source; the stickers are the produced look — use them.
+
+4. Mention which references were matched so the user can steer — a new
+   `vibe` in the next brief re-aims the direction.

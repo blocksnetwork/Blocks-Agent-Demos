@@ -1,0 +1,190 @@
+/* Design Blocks theme — "Faithful botanical", task 7b96ffec (design_blocks).
+   Tokens derived from the matched reference photos in the bank; scoped
+   under .journal-theme so the diagnosis page keeps its own styling.
+   Blueprint: banner-ledger hero, display 112px / ratio 1.55, calm motion. */
+@import url("https://fonts.bunny.net/css?family=lora:600,700|dm-sans:400,500,700&display=swap");
+
+.journal-theme {
+  --design-primary: #175039;
+  --design-primary-text: #ffffff;
+  --design-primary-strong: #175039;
+  --design-tint: #0a3e2d;
+  --design-bg: #fafaf9;
+  --design-surface: #ffffff;
+  --design-text: #28282e;
+  --design-muted: #6e6e78;
+  --design-border: #e4e4e7;
+  --design-radius: 10px;
+  --design-font-display: "Lora", Georgia, serif;
+  --design-font-body: "DM Sans", system-ui, sans-serif;
+  --design-space-1: 4px;
+  --design-space-2: 8px;
+  --design-space-3: 12px;
+  --design-space-4: 16px;
+  --design-space-5: 24px;
+  --design-space-6: 32px;
+  --design-space-7: 48px;
+  --design-space-8: 64px;
+
+  background: var(--design-bg);
+  color: var(--design-text);
+  font-family: var(--design-font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.journal-theme h1,
+.journal-theme h2,
+.journal-theme h3 {
+  font-family: var(--design-font-display);
+  color: var(--design-text);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+/* Blueprint type scale: display 112px, ÷1.55 per step (h2 ≈ 72, h3 ≈ 47);
+   clamped only so phones stay usable. */
+.journal-theme h1 {
+  font-size: clamp(56px, 11vw, 112px);
+  margin-bottom: var(--design-space-4);
+}
+.journal-theme h2 {
+  font-size: clamp(40px, 7vw, 72px);
+  margin-bottom: var(--design-space-3);
+}
+.journal-theme h3 {
+  font-size: clamp(28px, 4vw, 47px);
+  margin-bottom: var(--design-space-2);
+}
+
+.journal-theme p {
+  color: var(--design-muted);
+  max-width: 65ch;
+}
+
+.journal-theme a {
+  color: var(--design-primary-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.journal-theme button,
+.journal-theme [type="submit"],
+.journal-theme .btn {
+  background: var(--design-primary);
+  color: var(--design-primary-text);
+  font-family: var(--design-font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--design-radius);
+  padding: var(--design-space-3) var(--design-space-5);
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+.journal-theme button:hover,
+.journal-theme [type="submit"]:hover,
+.journal-theme .btn:hover {
+  filter: brightness(1.08);
+}
+
+.journal-theme input,
+.journal-theme select,
+.journal-theme textarea {
+  font-family: var(--design-font-body);
+  color: var(--design-text);
+  background: var(--design-surface);
+  border: 1px solid var(--design-border);
+  border-radius: var(--design-radius);
+  padding: var(--design-space-3) var(--design-space-4);
+}
+.journal-theme input:focus-visible,
+.journal-theme select:focus-visible,
+.journal-theme textarea:focus-visible {
+  outline: 2px solid var(--design-primary);
+  outline-offset: 1px;
+}
+
+/* ---- Blueprint-specific pieces (built to the section specs) ---- */
+
+/* header-band: name + purpose sit on a scrim over the hero image. */
+.journal-theme .on-scrim h1 {
+  color: #ffffff;
+}
+.journal-theme .on-scrim p {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* nav: links get underline-draw (motion kit), CTA goes pill. */
+.journal-theme .nav-link {
+  color: var(--design-text);
+  font-size: 15px;
+  text-decoration: none;
+}
+.journal-theme .btn-pill {
+  border-radius: 999px;
+  padding: var(--design-space-2) var(--design-space-5);
+  font-size: 15px;
+}
+
+/* composer: quick-action chips — pill, filled #169b95 when active. */
+.journal-theme button.chip {
+  background: var(--design-surface);
+  color: var(--design-muted);
+  font-weight: 500;
+  font-size: 14px;
+  border: 1px solid var(--design-border);
+  border-radius: 999px;
+  padding: var(--design-space-2) var(--design-space-4);
+}
+.journal-theme button.chip[aria-pressed="true"] {
+  background: var(--design-primary);
+  color: var(--design-primary-text);
+  border-color: var(--design-primary);
+}
+
+/* timeline: date line + tag pills. */
+.journal-theme .entry-date {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--design-muted);
+  font-weight: 600;
+}
+.journal-theme .tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--design-surface);
+  color: var(--design-primary-strong);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--design-border);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+/* Alternate subtle background tints per entry group. */
+.journal-theme .entry-card {
+  background: var(--design-surface);
+  border: 1px solid var(--design-border);
+  border-radius: var(--design-radius);
+}
+.journal-theme .entry-card.tinted {
+  background: color-mix(in srgb, var(--design-tint) 6%, var(--design-surface));
+}
+
+/* collection rail: horizontal scroll-snap, scrollbar hidden. */
+.journal-theme .rail {
+  display: flex;
+  gap: var(--design-space-4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: var(--design-space-2);
+}
+.journal-theme .rail::-webkit-scrollbar {
+  display: none;
+}
+.journal-theme .rail > * {
+  scroll-snap-align: start;
+  flex: none;
+}

@@ -1,0 +1,72 @@
+/* Design Blocks theme — link this last, after your existing styles. */
+@import url('https://fonts.bunny.net/css?family=fraunces:600,700|inter:400,500,600&display=swap');
+
+:root {
+  --design-primary: #945438;
+  --design-primary-text: #ffffff;
+  --design-primary-strong: #945438;
+  --design-bg: #fafaf9;
+  --design-surface: #ffffff;
+  --design-text: #28282e;
+  --design-muted: #6e6e78;
+  --design-border: #e4e4e7;
+  --design-radius: 10px;
+  --design-font-display: 'Fraunces', system-ui, sans-serif;
+  --design-font-body: 'Inter', system-ui, sans-serif;
+  --design-space-1: 4px;
+  --design-space-2: 8px;
+  --design-space-3: 12px;
+  --design-space-4: 16px;
+  --design-space-5: 24px;
+  --design-space-6: 32px;
+  --design-space-7: 48px;
+  --design-space-8: 64px;
+}
+
+body {
+  background: var(--design-bg);
+  color: var(--design-text);
+  font-family: var(--design-font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--design-font-display);
+  color: var(--design-text);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+h1 { font-size: clamp(2rem, 5vw, 3rem); margin-bottom: var(--design-space-4); }
+h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); margin-bottom: var(--design-space-3); }
+h3 { font-size: 1.15rem; margin-bottom: var(--design-space-2); }
+
+p { color: var(--design-muted); max-width: 65ch; }
+
+a { color: var(--design-primary-strong); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+button, [type='submit'], .btn {
+  background: var(--design-primary);
+  color: var(--design-primary-text);
+  font-family: var(--design-font-body);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--design-radius);
+  padding: var(--design-space-3) var(--design-space-5);
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+button:hover, [type='submit']:hover, .btn:hover { filter: brightness(1.08); }
+
+input, select, textarea {
+  font-family: var(--design-font-body);
+  color: var(--design-text);
+  background: var(--design-surface);
+  border: 1px solid var(--design-border);
+  border-radius: var(--design-radius);
+  padding: var(--design-space-3) var(--design-space-4);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--design-primary);
+  outline-offset: 1px;
+}

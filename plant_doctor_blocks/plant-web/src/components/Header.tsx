@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function Header() {
   return (
     <header className="flex flex-wrap items-center justify-between gap-6">
@@ -26,8 +28,14 @@ export function Header() {
           <div className="text-[12px] text-body">One photo, one diagnosis.</div>
         </div>
       </div>
-      <div className="text-[12px] text-mute">
-        JPEG, PNG or WebP · up to 10 MB
+      <div className="flex items-center gap-4 text-[12px] text-mute">
+        <span>JPEG, PNG or WebP · up to 10 MB</span>
+        <Link
+          href="/journal"
+          className="font-medium text-leaf-deep hover:text-leaf-dark"
+        >
+          Journal →
+        </Link>
       </div>
     </header>
   );

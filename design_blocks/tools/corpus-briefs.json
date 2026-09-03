@@ -1,0 +1,22 @@
+[
+  { "id": "devtools-ci", "text": "continuous integration health dashboard for platform engineers, technical, calm confidence" },
+  { "id": "fintech-budget", "text": "personal budgeting app that rounds up spare change into savings, friendly, trustworthy" },
+  { "id": "health-sleep", "text": "sleep tracking companion for shift workers, soothing, scientific" },
+  { "id": "edu-language", "text": "microlearning language flashcards for busy commuters, playful, encouraging" },
+  { "id": "commerce-sneaker", "text": "limited-edition sneaker drop storefront, hype, kinetic" },
+  { "id": "portfolio-arch", "text": "portfolio site for a small architecture studio, minimal, monumental" },
+  { "id": "saas-crm", "text": "lightweight CRM for two-person consultancies, pragmatic, warm" },
+  { "id": "hardware-synth", "text": "modular synthesizer starter kit product page, geeky, tactile" },
+  { "id": "community-garden", "text": "neighborhood tool-lending and garden share community, grassroots, sunny" },
+  { "id": "food-meal", "text": "weeknight meal planning service with regional recipes, appetizing, unfussy" },
+  { "id": "travel-rail", "text": "scenic rail journey planner for slow travelers, wanderlust, editorial" },
+  { "id": "music-practice", "text": "daily practice tracker for orchestra students, disciplined, inspiring" },
+  { "id": "legal-freelance", "text": "contract templates marketplace for freelancers, plainspoken, reassuring" },
+  { "id": "realestate-coop", "text": "housing cooperative listings portal, transparent, communal" },
+  { "id": "fitness-climb", "text": "indoor climbing gym membership and route tracker, energetic, gritty" },
+  { "id": "kids-astronomy", "text": "stargazing guide for curious kids, wondrous, gentle" },
+  { "id": "climate-solar", "text": "rooftop solar savings calculator for homeowners, optimistic, credible" },
+  { "id": "gaming-guild", "text": "guild coordination hub for co-op raid teams, dark-mode, competitive" },
+  { "id": "logistics-fleet", "text": "delivery fleet route optimization console, dense, operational" },
+  { "id": "nonprofit-water", "text": "clean water nonprofit annual impact report site, hopeful, dignified" }
+]

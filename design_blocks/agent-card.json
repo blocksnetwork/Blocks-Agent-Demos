@@ -1,0 +1,159 @@
+{
+  "identity": {
+    "agentName": "design_blocks",
+    "displayName": "Design",
+    "description": "Send a one-line brief, get three RENDERED page compositions back. A vision model decomposes curated reference designs into transferable composition principles (depth planes, overlaps, data pinned to imagery, container breaks) and transfers them onto YOUR product — then renders, structurally scores, critiques, and revises the winner. Ships a composition spec + positioned composition.html, a WCAG-solved theme.css, design kit, hero.png, and og.png.",
+    "version": "0.2.0",
+    "provider": {
+      "organization": "Markus Kohler"
+    }
+  },
+  "capabilities": {
+    "taskKinds": [
+      "request"
+    ]
+  },
+  "io": {
+    "inputs": [
+      {
+        "id": "brief",
+        "description": "What you are about to build. JSON {goal, vibe, framework, count} — or just a plain sentence like \"playful waitlist page for a plant-care app\". count picks how many references come back (2-8, default 4).",
+        "contentType": "text/plain",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "id": "direction",
+        "description": "The design direction as markdown: which comp won and why, concrete build guidance, the three comps ranked with scores, and apply-in-order instructions.",
+        "contentType": "text/markdown",
+        "guaranteed": true
+      },
+      {
+        "id": "kit",
+        "description": "Machine-readable design kit: provenance (composition source, reference id, signature patterns used, principles that survived the render, sanitizer repairs, critique rounds, deadline sheds), winner (tokens, palette, headline, hero source), all three directions with structural + domain + palette score parts, icons (inline SVG + npm imports), photo, pattern, matched refs, notes.",
+        "contentType": "application/json",
+        "guaranteed": true
+      },
+      {
+        "id": "blueprint",
+        "description": "The build plan for the winning COMPOSITION: every element with its resolved percent geometry, depth plane, overlaps, pinned annotations, container breaks, imagery treatment, and custom viz primitives — derived from the composition spec, not from section recipes. The coding agent builds THIS, not its own habits.",
+        "contentType": "text/markdown",
+        "guaranteed": true
+      },
+      {
+        "id": "theme_css",
+        "description": "Append-safe stylesheet for the winning direction: WCAG-solved custom properties plus element overrides. Link it after existing styles and it applies without refactoring.",
+        "contentType": "text/css",
+        "guaranteed": true
+      },
+      {
+        "id": "motion_css",
+        "description": "Micro-animation kit tuned to the direction's energy: staggered scroll reveals, floating drift, hover lift/tilt, underline draw, scrolled-nav state — all wired via data-attributes, reduced-motion safe.",
+        "contentType": "text/css",
+        "guaranteed": true
+      },
+      {
+        "id": "motion_js",
+        "description": "Dependency-free companion script for the motion kit (IntersectionObserver reveals, float phasing, pointer tilt). Load with defer.",
+        "contentType": "text/javascript",
+        "guaranteed": true
+      },
+      {
+        "id": "stickers",
+        "description": "Floating component assets rendered in the winning direction's real fonts and palette — stat chips, sticker badges, tag pills, mini-cards — as inline-ready SVG strings with brief-specific content.",
+        "contentType": "application/json",
+        "guaranteed": false
+      },
+      {
+        "id": "comp_1",
+        "description": "Direction 1 (faithful transfer) as a rendered full-page composition preview — the actual page layout: depth planes, overlaps, pinned data, container breaks. Falls back to a 1200x1500 style tile when composition transfer was unavailable.",
+        "contentType": "image/png",
+        "guaranteed": false
+      },
+      {
+        "id": "comp_2",
+        "description": "Direction 2 (bolder — transferred from the structurally richest matched reference), same rendering.",
+        "contentType": "image/png",
+        "guaranteed": false
+      },
+      {
+        "id": "comp_3",
+        "description": "Direction 3 (unexpected — transferred from the most visually distant reference), same rendering.",
+        "contentType": "image/png",
+        "guaranteed": false
+      },
+      {
+        "id": "comps",
+        "description": "All three comps side by side with scores, winner ringed — show this to the user before building.",
+        "contentType": "image/png",
+        "guaranteed": false
+      },
+      {
+        "id": "hero",
+        "description": "The winning direction's 1024px hero image: the licensed bank photograph matched to the brief, gradient-mapped to the exact token palette (credit in kit.winner.heroCredit). Procedural gradient only when the bank has no match.",
+        "contentType": "image/png",
+        "guaranteed": true
+      },
+      {
+        "id": "og",
+        "description": "1200x630 og:image — the winner's hero under a scrim with the headline composited in the winning typeface.",
+        "contentType": "image/png",
+        "guaranteed": false
+      },
+      {
+        "id": "board",
+        "description": "A contact-sheet JPEG of the matched reference designs from the bank. Absent when the bank is empty or the embed sidecar is down.",
+        "contentType": "image/jpeg",
+        "guaranteed": false
+      }
+      ,{
+        "id": "composition_spec",
+        "description": "The winning CompositionSpec plus its resolved pixel geometry: elements with roles, frames, depth planes, relations (overlaps / attachedTo / breaksContainer / offsetFrom / encircles), imagery treatments, viz drawing primitives, and the resolver's adjustment log. The machine-readable form of the design.",
+        "contentType": "application/json",
+        "guaranteed": false
+      },
+      {
+        "id": "composition_html",
+        "description": "The winning composition serialized as standalone positioned HTML/CSS — identical geometry to the comp preview by construction (percent-positioned, z-index from depth planes, inline viz SVGs, data-role attributes). Port it into your framework instead of re-inventing the layout.",
+        "contentType": "text/html",
+        "guaranteed": false
+      },
+      {
+        "id": "analysis",
+        "description": "The winning reference's structural decomposition: visual masses with bounding boxes, depth planes and overlaps, imagery integration, data-display forms, and the signature patterns (observation + transferable principle) the transfer was built from.",
+        "contentType": "application/json",
+        "guaranteed": false
+      }
+    ]
+  },
+  "tags": [
+    {
+      "id": "design-direction",
+      "name": "Design direction",
+      "description": "Get a moodboard and concrete direction matched to your brief before building: references, palette, typography, layout guidance.",
+      "examples": [
+        "I'm about to vibe-code a landing page for a plant-care app — give me a design direction",
+        "Moody fintech dashboard, dark, give me references and a palette",
+        "Playful kids-game signup page: board, tokens, and fonts"
+      ]
+    },
+    {
+      "id": "design-assets",
+      "name": "Design tokens and assets",
+      "description": "A WCAG-solved color system as drop-in CSS, a curated font pairing, permissively-licensed icons, and imagery matched to the brief.",
+      "examples": [
+        "Give me a drop-in theme.css for a technical dashboard",
+        "Find me icons and a font pairing for an elegant boutique site"
+      ]
+    }
+  ],
+  "runtime": {
+    "handler": "./handler.ts",
+    "handlerExport": "default",
+    "concurrency": 1,
+    "expectedInstances": 1,
+    "maxRunningTimeSec": 600,
+    "maxPendingBacklog": 10
+  }
+}

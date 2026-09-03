@@ -32,11 +32,31 @@ coverage/
 *-Playbook.md
 notes/
 docs/private/
+marketing/
 
 # Local sample media used when testing agents by hand
 sample-plant.jpg
 sample-*.jpeg
 sample-*.png
+
+# Design bank data + generated outputs — live on the box, not in git
+design_blocks/bank/
+design_blocks/inspo/
+design_blocks/fonts-cache/
+design_blocks/design-kit.json
+design_blocks/design-theme.css
+design_blocks/design-board.jpg
+design_blocks/*.png
+design_blocks/corpus/
+design_blocks/corpus-box/
+design_blocks/test/out/
+design_blocks/sproutly-design/
+
+# Task outputs downloaded while testing agents by hand, and session reports
+design-out/
+
+# macOS resource forks
+._*
 
 # Logs
 *.log

@@ -1,0 +1,107 @@
+/* Design Blocks motion kit — energy: calm. Delivered as design-motion.css
+   (task 20c2f567); linked after journal-theme.css. */
+
+:root {
+  --motion-duration: 700ms;
+  --motion-stagger: 110ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Scroll reveals: add data-reveal to a single element, or
+   data-reveal-group to a parent whose children should stagger in. */
+[data-reveal],
+[data-reveal-group] > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--motion-duration) var(--motion-ease),
+    transform var(--motion-duration) var(--motion-ease);
+  transition-delay: calc(var(--i, 0) * var(--motion-stagger));
+}
+[data-reveal].is-visible,
+[data-reveal-group].is-visible > * {
+  opacity: 1;
+  transform: none;
+}
+
+/* Floating drift for stickers/chips: each element gets its own phase via
+   --float-delay (set automatically by the motion kit). */
+@keyframes design-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--float-rotate, 0deg));
+  }
+  50% {
+    transform: translateY(-8px) rotate(var(--float-rotate, 0deg));
+  }
+}
+[data-float] {
+  animation: design-float 4200ms ease-in-out infinite;
+  animation-delay: var(--float-delay, 0ms);
+  will-change: transform;
+}
+
+/* Hover lift for cards. */
+.hover-lift {
+  transition:
+    transform 220ms var(--motion-ease),
+    box-shadow 220ms var(--motion-ease);
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(15, 15, 20, 0.1);
+}
+
+/* Pointer tilt for collage cards: add data-tilt. */
+[data-tilt] {
+  transition: transform 180ms var(--motion-ease);
+  will-change: transform;
+}
+
+/* Underline draw for links: wrap link text in .underline-draw. */
+.underline-draw {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 260ms var(--motion-ease);
+  padding-bottom: 2px;
+}
+.underline-draw:hover,
+a:hover > .underline-draw {
+  background-size: 100% 2px;
+}
+
+/* Nav gains its edge only after scroll (motion kit toggles .is-scrolled). */
+.nav-scroll-edge {
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color 240ms var(--motion-ease),
+    background-color 240ms var(--motion-ease);
+}
+.nav-scroll-edge.is-scrolled {
+  border-bottom-color: #e4e4e7;
+}
+
+/* Button press: tiny, everywhere. */
+.journal-theme button:active,
+.journal-theme .btn:active,
+.journal-theme [type="submit"]:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal-group] > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  [data-float] {
+    animation: none;
+  }
+  [data-tilt],
+  .hover-lift {
+    transition: none;
+  }
+}

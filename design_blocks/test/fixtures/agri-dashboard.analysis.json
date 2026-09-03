@@ -1,0 +1,80 @@
+{
+  "summary": "agriculture dashboard where a giant plant photograph is the structural centerpiece with data pinned directly to it",
+  "composition": {
+    "dominant_region": "right-of-center, a plant photo spanning most of the upper two thirds",
+    "masses": [
+      { "what": "plant photograph", "area": "dominant", "bbox": { "x": 38, "y": 8, "w": 44, "h": 62 } },
+      { "what": "health ring around the plant", "area": "large", "bbox": { "x": 34, "y": 4, "w": 52, "h": 70 } },
+      { "what": "diagnostics panel", "area": "medium", "bbox": { "x": 2, "y": 34, "w": 26, "h": 40 } },
+      { "what": "watering timeline band", "area": "medium", "bbox": { "x": 6, "y": 74, "w": 88, "h": 18 } },
+      { "what": "metric labels on leaves", "area": "small", "bbox": { "x": 24, "y": 14, "w": 14, "h": 8 } }
+    ],
+    "symmetry": "strongly-asymmetric",
+    "focal_point": "the plant itself, not any panel",
+    "reading_path": "eye lands on the plant, walks the pinned labels outward, then drops to the timeline",
+    "grid": "12-column base, but the plant crosses every column right of center and ignores the grid"
+  },
+  "layering": {
+    "planes": 4,
+    "overlaps": [
+      { "front": "diagnostics panel", "back": "plant photograph", "degree": "partial" },
+      { "front": "health ring", "back": "plant photograph", "degree": "partial" },
+      { "front": "metric labels", "back": "plant photograph", "degree": "slight" }
+    ],
+    "container_breaks": ["plant photograph escapes its hero band", "moss texture spills past the footer edge"],
+    "floating": ["metric labels", "alert chip"]
+  },
+  "imagery": [
+    {
+      "subject": "potted monstera plant",
+      "role": "structural-subject",
+      "integration": "panels sit partially behind and partially in front of it; metric labels are pinned to its leaves"
+    },
+    {
+      "subject": "moss texture",
+      "role": "texture",
+      "integration": "spills outside its container edge at the page bottom"
+    }
+  ],
+  "data_display": [
+    {
+      "what": "leaf moisture and light exposure",
+      "form": "values pinned to spatial coordinates on the subject with leader lines",
+      "integration": "attached to leaf regions of the plant"
+    },
+    {
+      "what": "overall plant health",
+      "form": "segmented ring wrapping the subject",
+      "integration": "wraps around the plant, passing behind it at the top"
+    },
+    {
+      "what": "watering history",
+      "form": "flowing horizontal timeline with node dots",
+      "integration": "full-width band under the composition"
+    }
+  ],
+  "geometry": { "corners": "soft, organic radii", "shapes": "circles and leaf-like curves", "diagonals": false, "organic": true },
+  "density": { "overall": "balanced", "gradient": "dense on the left third, sparse on the right" },
+  "signature_patterns": [
+    {
+      "observation": "the plant photo occupies ~45% of the canvas right of center and escapes its hero band on top",
+      "principle": "one oversized domain subject anchors the composition and escapes its container"
+    },
+    {
+      "observation": "three data labels connect by leader lines to points on the leaves",
+      "principle": "attach data spatially to meaningful regions of the primary subject instead of placing metrics in separate cards"
+    },
+    {
+      "observation": "a segmented health ring wraps the plant, passing behind the foliage at the top",
+      "principle": "wrap the key status indicator around the subject rather than boxing it"
+    },
+    {
+      "observation": "glass panels sit both behind and in front of the plant at four apparent depths",
+      "principle": "use at least four depth planes, with panels layered both behind and in front of the subject"
+    },
+    {
+      "observation": "the left third is dense with diagnostics while the right of the plant stays nearly empty",
+      "principle": "let information density fall off across the reading axis and keep the composition strongly off-axis"
+    }
+  ]
+}
