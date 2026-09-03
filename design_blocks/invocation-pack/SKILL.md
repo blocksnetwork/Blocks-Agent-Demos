@@ -65,6 +65,11 @@ numbers — sizes, paddings, overlaps, rotations. It outranks your habits.**
 
 1. Show the user `comps` and name the winner (a different pick = build
    that comp: its genome and tokens are in the kit's `directions`).
+   Read `kit.provenance` first: if `compositionSource` is
+   `template-fallback`, or `qualityGate.ok` is false, or `sheds` mentions
+   the quality gate, STOP and tell the user the agent could not produce a
+   design it would stand behind — offer to re-brief (a sharper `goal` and
+   `vibe`) instead of building a fallback.
 2. Read `blueprint` end to end BEFORE writing any markup.
 3. Wire the files: `design-theme.css` after existing styles, then
    `design-motion.css`, then `<script src="design-motion.js" defer>`.

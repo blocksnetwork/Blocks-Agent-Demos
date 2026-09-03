@@ -42,6 +42,7 @@ sample-*.png
 # Design bank data + generated outputs — live on the box, not in git
 design_blocks/bank/
 design_blocks/inspo/
+design_blocks/inspo-ui/
 design_blocks/fonts-cache/
 design_blocks/design-kit.json
 design_blocks/design-theme.css

@@ -1,0 +1,658 @@
+{
+ "spec": {
+  "version": 1,
+  "canvas": {
+   "width": 1440,
+   "height": 2100
+  },
+  "focalElementId": "leaf-photo",
+  "planes": 2,
+  "principles": [
+   "irregular organic boundaries divide the page into zones instead of straight rules — the uploaded-leaf zone bleeds into the diagnosis zone along a jagged edge",
+   "a single continuous grainy botanical surface unifies both zones rather than floating separated cards",
+   "hard-edged color shift (living green upper zone / clinical silver lower zone) marks a change of function with no blend",
+   "density is highest top-left on the specimen photo and thins toward the lower-right differential list",
+   "one deliberate partial overlap: the verdict panel crosses the organic boundary of the specimen zone"
+  ],
+  "source": {
+   "referenceId": "18aa5bbbad4a",
+   "stance": "faithful",
+   "signaturePatternsUsed": [
+    "Use irregular, organic boundaries to define sections instead of straight lines, creating a sense of natural growth or biological structure.",
+    "Apply a consistent texture or grain across the entire composition to create a unified, tactile surface rather than separating elements by depth.",
+    "Use hard-edged color transitions within organic shapes to create distinct zones of meaning or function without visual blending.",
+    "Use directional lighting to cast deep shadows within organic shapes to enhance the perception of depth and volume."
+   ]
+  },
+  "elements": [
+   {
+    "id": "nav",
+    "role": "navigation",
+    "kind": "group",
+    "frame": {
+     "x": 0,
+     "y": 0,
+     "w": 100,
+     "h": 4
+    },
+    "z": 2,
+    "relations": [],
+    "style": {}
+   },
+   {
+    "id": "nav-brand",
+    "role": "wordmark",
+    "kind": "text",
+    "parent": "nav",
+    "frame": {
+     "x": 2,
+     "y": 18,
+     "w": 22,
+     "h": 64
+    },
+    "z": 2,
+    "relations": [],
+    "content": {
+     "heading": "Plant Doctor"
+    },
+    "style": {}
+   },
+   {
+    "id": "nav-links",
+    "role": "nav links",
+    "kind": "text",
+    "parent": "nav",
+    "frame": {
+     "x": 58,
+     "y": 24,
+     "w": 40,
+     "h": 52
+    },
+    "z": 2,
+    "relations": [],
+    "content": {
+     "items": [
+      "New scan",
+      "History",
+      "Agents",
+      "Care guide"
+     ]
+    },
+    "style": {}
+   },
+   {
+    "id": "canopy-band",
+    "role": "organic living-tissue zone bleeding off top and left",
+    "kind": "shape",
+    "frame": {
+     "x": -6,
+     "y": -3,
+     "w": 112,
+     "h": 39
+    },
+    "z": 1,
+    "relations": [
+     {
+      "type": "breaksContainer",
+      "side": "left",
+      "amount": 0.14
+     }
+    ],
+    "imagery": {
+     "subject": "macro leaf-cell texture, hard-edged organic blob boundary, deep raking shadow",
+     "integration": "bleed",
+     "surface": "texture",
+     "mask": "none"
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "primary",
+     "emphasis": 0.85
+    }
+   },
+   {
+    "id": "leaf-photo",
+    "role": "primary-subject uploaded specimen",
+    "kind": "image",
+    "frame": {
+     "x": 2,
+     "y": 1,
+     "w": 53,
+     "h": 38
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "breaksContainer",
+      "side": "left",
+      "amount": 0.1
+     }
+    ],
+    "imagery": {
+     "subject": "potted houseplant leaf with brown ringed disease spotting, raking side light, irregular torn edge",
+     "integration": "bleed",
+     "surface": "texture",
+     "mask": "none"
+    },
+    "content": {
+     "label": "Drop a new photo to replace · monstera_02.jpg",
+     "fit": "fill"
+    },
+    "style": {
+     "emphasis": 1
+    }
+   },
+   {
+    "id": "headline",
+    "role": "headline in the sparse right of the dense band",
+    "kind": "text",
+    "frame": {
+     "x": 54,
+     "y": 6,
+     "w": 42,
+     "h": 19
+    },
+    "z": 2,
+    "relations": [],
+    "content": {
+     "heading": "Drop a photo of a sick plant and an AI agent diagnoses it",
+     "body": "Six-step analysis on the Blocks network. Evidence pinned to the leaf, treatment sequenced by day.",
+     "fit": "fill"
+    },
+    "style": {
+     "paletteRole": "ink",
+     "emphasis": 0.9
+    }
+   },
+   {
+    "id": "pipeline",
+    "role": "live agent progress stream riding the zone boundary",
+    "kind": "viz",
+    "frame": {
+     "x": 44,
+     "y": 26,
+     "w": 62,
+     "h": 11
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "breaksContainer",
+      "side": "right",
+      "amount": 0.12
+     }
+    ],
+    "viz": {
+     "intent": "progress of the running multi-step analysis in real time",
+     "form": "flowing line along the organic boundary, named steps as nodes, current stage lit",
+     "render": [
+      {
+       "primitive": "flowLine",
+       "params": {
+        "nodes": 6,
+        "activeIndex": 4,
+        "pulse": true
+       }
+      },
+      {
+       "primitive": "sparkline",
+       "params": {
+        "role": "elapsed"
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Ingest photo",
+       "value": "done 0.4s"
+      },
+      {
+       "label": "Segment leaf",
+       "value": "done 1.1s"
+      },
+      {
+       "label": "Lesion detect",
+       "value": "done 2.6s"
+      },
+      {
+       "label": "Match pathogen DB",
+       "value": "running 3.9s"
+      },
+      {
+       "label": "Rank candidates",
+       "value": "queued"
+      },
+      {
+       "label": "Draft plan",
+       "value": "queued"
+      }
+     ]
+    },
+    "style": {
+     "surface": "glass",
+     "paletteRole": "accent"
+    }
+   },
+   {
+    "id": "evidence-a",
+    "role": "evidence marker pinned to a leaf region",
+    "kind": "viz",
+    "frame": {
+     "x": 31,
+     "y": 6,
+     "w": 19,
+     "h": 8
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "leaf-photo",
+      "at": {
+       "x": 38,
+       "y": 26
+      }
+     }
+    ],
+    "viz": {
+     "intent": "mark where symptoms appear and how sure the marker is",
+     "form": "caption pinned to the lesion with a leader line",
+     "render": [
+      {
+       "primitive": "leaderCallout",
+       "params": {
+        "dotRadius": 6
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Upper blade · concentric brown rings",
+       "value": "0.91"
+      }
+     ]
+    },
+    "style": {
+     "surface": "glass",
+     "paletteRole": "accent"
+    }
+   },
+   {
+    "id": "evidence-b",
+    "role": "evidence marker pinned to a second leaf region",
+    "kind": "viz",
+    "frame": {
+     "x": 36,
+     "y": 24,
+     "w": 18,
+     "h": 8
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "leaf-photo",
+      "at": {
+       "x": 62,
+       "y": 72
+      }
+     }
+    ],
+    "viz": {
+     "intent": "mark where symptoms appear and how sure the marker is",
+     "form": "caption pinned to the lesion with a leader line",
+     "render": [
+      {
+       "primitive": "leaderCallout",
+       "params": {
+        "dotRadius": 5
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Midrib base · yellow halo, wet margin",
+       "value": "0.74"
+      }
+     ]
+    },
+    "style": {
+     "surface": "glass",
+     "paletteRole": "accent"
+    }
+   },
+   {
+    "id": "verdict",
+    "role": "diagnosis verdict crossing the organic boundary",
+    "kind": "panel",
+    "frame": {
+     "x": 2,
+     "y": 30,
+     "w": 33,
+     "h": 27
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "overlaps",
+      "target": "canopy-band",
+      "amount": 0.14,
+      "side": "top"
+     }
+    ],
+    "content": {
+     "heading": "Alternaria leaf spot",
+     "body": "A fungal spotting spread by damp foliage. Common, treatable, not fatal to a healthy plant — remove affected leaves and keep water off the blades.",
+     "label": "Primary verdict",
+     "items": [
+      "Confidence: high",
+      "Onset: 1–2 weeks",
+      "Contagious to nearby pots"
+     ],
+     "fit": "fill"
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "surface",
+     "emphasis": 0.8
+    }
+   },
+   {
+    "id": "confidence-ring",
+    "role": "verdict certainty ring wrapping the verdict",
+    "kind": "viz",
+    "frame": {
+     "x": -3,
+     "y": 27,
+     "w": 43,
+     "h": 50
+    },
+    "z": 1,
+    "relations": [
+     {
+      "type": "encircles",
+      "target": "verdict",
+      "ratio": 1.12
+     }
+    ],
+    "viz": {
+     "intent": "certainty of the verdict at a glance",
+     "form": "open ring segment wrapped around the verdict mass",
+     "render": [
+      {
+       "primitive": "ringSegment",
+       "params": {
+        "fraction": 0.87,
+        "thickness": 10
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Diagnosis confidence",
+       "value": "87%"
+      }
+     ]
+    },
+    "style": {
+     "surface": "outline",
+     "paletteRole": "accent",
+     "emphasis": 0.6
+    }
+   },
+   {
+    "id": "treatment",
+    "role": "numbered treatment plan in the silver zone",
+    "kind": "panel",
+    "frame": {
+     "x": 38,
+     "y": 42,
+     "w": 34,
+     "h": 42
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "offsetFrom",
+      "target": "verdict",
+      "edge": "right",
+      "amount": 0.1
+     }
+    ],
+    "content": {
+     "heading": "Treatment plan",
+     "label": "6 actions · 3 weeks",
+     "items": [
+      "1 · Snip every spotted leaf at the petiole — today",
+      "2 · Bag and bin clippings, sterilise shears — today",
+      "3 · Stop overhead watering, water the soil only — today",
+      "4 · Thin neighbours for airflow — day 2",
+      "5 · Copper fungicide on remaining foliage — day 3, repeat day 10",
+      "6 · Re-photograph and rescan — day 21"
+     ],
+     "fit": "fill"
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "neutral",
+     "emphasis": 0.65
+    }
+   },
+   {
+    "id": "differentials",
+    "role": "ranked competing explanations, thinnest density",
+    "kind": "viz",
+    "frame": {
+     "x": 74,
+     "y": 48,
+     "w": 21,
+     "h": 20
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "breaksContainer",
+      "side": "right",
+      "amount": 0.08
+     }
+    ],
+    "viz": {
+     "intent": "compare magnitudes across competing explanations",
+     "form": "stacked bars ranked below the primary result",
+     "render": [
+      {
+       "primitive": "barColumn",
+       "params": {
+        "orientation": "horizontal",
+        "bars": 4,
+        "sorted": true
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Alternaria leaf spot",
+       "value": "87%"
+      },
+      {
+       "label": "Bacterial leaf spot",
+       "value": "41%"
+      },
+      {
+       "label": "Septoria",
+       "value": "18%"
+      },
+      {
+       "label": "Sunscald",
+       "value": "9%"
+      }
+     ]
+    },
+    "style": {
+     "surface": "outline",
+     "paletteRole": "ink",
+     "emphasis": 0.45
+    }
+   },
+   {
+    "id": "footer",
+    "role": "provenance footer line",
+    "kind": "text",
+    "frame": {
+     "x": 3,
+     "y": 88,
+     "w": 68,
+     "h": 5
+    },
+    "z": 1,
+    "relations": [],
+    "content": {
+     "body": "Produced by leaf-triage-agent v2.4 · vision model phyto-vit-L on the Blocks network · Not a substitute for a plant pathologist; confirm before treating edible crops."
+    },
+    "style": {}
+   }
+  ]
+ },
+ "resolved": [
+  {
+   "id": "canopy-band",
+   "x": -226,
+   "y": -63,
+   "w": 1613,
+   "h": 819,
+   "z": 1
+  },
+  {
+   "id": "confidence-ring",
+   "x": -51,
+   "y": 596,
+   "w": 635,
+   "h": 635,
+   "z": 1,
+   "ring": {
+    "cx": 266.40000000000003,
+    "cy": 913.5,
+    "r": 317.52000000000004,
+    "thickness": 28.576800000000002
+   }
+  },
+  {
+   "id": "footer",
+   "x": 43,
+   "y": 1848,
+   "w": 979,
+   "h": 105,
+   "z": 1
+  },
+  {
+   "id": "nav",
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 84,
+   "z": 2
+  },
+  {
+   "id": "leaf-photo",
+   "x": -76,
+   "y": 21,
+   "w": 763,
+   "h": 798,
+   "z": 2
+  },
+  {
+   "id": "headline",
+   "x": 778,
+   "y": 126,
+   "w": 605,
+   "h": 399,
+   "z": 2
+  },
+  {
+   "id": "pipeline",
+   "x": 654,
+   "y": 546,
+   "w": 893,
+   "h": 231,
+   "z": 2
+  },
+  {
+   "id": "evidence-a",
+   "x": 446,
+   "y": 126,
+   "w": 274,
+   "h": 168,
+   "z": 2,
+   "attachPoint": {
+    "x": 213.69600000000003,
+    "y": 228.48000000000002
+   }
+  },
+  {
+   "id": "evidence-b",
+   "x": 518,
+   "y": 504,
+   "w": 259,
+   "h": 168,
+   "z": 2,
+   "attachPoint": {
+    "x": 396.86400000000003,
+    "y": 595.56
+   }
+  },
+  {
+   "id": "verdict",
+   "x": 29,
+   "y": 630,
+   "w": 475,
+   "h": 567,
+   "z": 2
+  },
+  {
+   "id": "treatment",
+   "x": 158,
+   "y": 882,
+   "w": 490,
+   "h": 882,
+   "z": 2
+  },
+  {
+   "id": "differentials",
+   "x": 1162,
+   "y": 1008,
+   "w": 302,
+   "h": 420,
+   "z": 2
+  },
+  {
+   "id": "nav-brand",
+   "x": 29,
+   "y": 15,
+   "w": 317,
+   "h": 54,
+   "z": 2
+  },
+  {
+   "id": "nav-links",
+   "x": 835,
+   "y": 20,
+   "w": 576,
+   "h": 44,
+   "z": 2
+  }
+ ],
+ "canvas": {
+  "width": 1440,
+  "height": 2100
+ },
+ "adjustments": [
+  "confidence-ring: locked concentric with verdict (r=318px)",
+  "treatment: deliberate right-misalignment of 144px vs verdict enforced",
+  "canopy-band: pushed 14% past its container's left edge",
+  "leaf-photo: pushed 10% past its container's left edge",
+  "pipeline: pushed 12% past its container's right edge",
+  "differentials: pushed 8% past its container's right edge",
+  "nav-brand: glass scrim forced (sits on canopy-band)",
+  "nav-links: glass scrim forced (sits on canopy-band)"
+ ]
+}

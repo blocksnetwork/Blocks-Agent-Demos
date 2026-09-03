@@ -41,10 +41,11 @@ function argAfter(flag: string, fallback: string): string {
 async function main() {
   const source = process.argv[2];
   if (!source || source.startsWith('--')) {
-    console.error('Usage: npx tsx ingest/ingest.ts ./folder-of-images [--bank ./bank]');
+    console.error('Usage: npx tsx ingest/ingest.ts ./folder-of-images [--bank ./bank] [--kind ui|photo]');
     process.exit(1);
   }
   const bankDir = argAfter('--bank', './bank');
+  const kindOverride = argAfter('--kind', '');
 
   await mkdir(join(bankDir, 'refs'), { recursive: true });
   await mkdir(join(bankDir, 'thumbs'), { recursive: true });
@@ -91,7 +92,14 @@ async function main() {
     // vLLM down: fall back to zero-shot CLIP labels over the same sidecar.
     const tags = qwenTags ?? (embedding ? await zeroShotTags(embedding) : null);
     if (!tags) console.error(`  ! no tags for ${file} (vLLM and sidecar down?) — ingesting unlabeled`);
-    const kind = embedding ? await classifyKind(embedding) : 'unknown';
+    // --kind ui|photo overrides the zero-shot classifier, which calls
+    // texture and macro photography "ui" often enough to matter
+    const kind =
+      kindOverride === 'ui' || kindOverride === 'photo'
+        ? kindOverride
+        : embedding
+          ? await classifyKind(embedding)
+          : 'unknown';
 
     // The structural decomposition is what composition transfer runs on.
     // Ingest is the cheap moment to pay for it; query time backfills any

@@ -1,0 +1,521 @@
+{
+ "spec": {
+  "version": 1,
+  "canvas": {
+   "width": 1440,
+   "height": 2200
+  },
+  "focalElementId": "leafSubject",
+  "planes": 2,
+  "principles": [
+   "dominant mass anchors top-left with high-contrast green texture",
+   "organic irregular boundaries replace rigid grids to mimic cellular structure",
+   "diagnostic data pins directly onto the leaf anatomy rather than floating panels",
+   "vertical flow line carries the headline and progress stream down the left edge",
+   "density fills the entire canvas height with no empty bands"
+  ],
+  "source": {
+   "referenceId": "18aa5bbbad4a",
+   "stance": "faithful",
+   "signaturePatternsUsed": [
+    "dominant top-left mass",
+    "organic irregular boundaries",
+    "pinned diagnostic data",
+    "vertical flow line"
+   ]
+  },
+  "elements": [
+   {
+    "id": "nav-ghost",
+    "role": "navigation",
+    "kind": "group",
+    "frame": {
+     "x": 0,
+     "y": 0,
+     "w": 100,
+     "h": 3
+    },
+    "z": 2,
+    "relations": [],
+    "content": {
+     "items": [
+      "upload",
+      "history",
+      "settings"
+     ]
+    },
+    "style": {
+     "surface": "outline",
+     "paletteRole": "neutral",
+     "emphasis": 0.05
+    }
+   },
+   {
+    "id": "leafSubject",
+    "role": "primary-subject",
+    "kind": "image",
+    "frame": {
+     "x": -38,
+     "y": -32,
+     "w": 100,
+     "h": 100
+    },
+    "z": 1,
+    "relations": [],
+    "imagery": {
+     "subject": "macro closeup of a healthy green leaf with a single subtle brown necrotic spot, cellular texture visible, soft directional lighting casting deep shadows within the veins",
+     "integration": "cutout",
+     "surface": "texture",
+     "mask": "none"
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "primary",
+     "emphasis": 0.9
+    }
+   },
+   {
+    "id": "headline-stream",
+    "role": "headline-in-flow",
+    "kind": "text",
+    "frame": {
+     "x": 0,
+     "y": 105,
+     "w": 12,
+     "h": 14
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "leafSubject",
+      "at": {
+       "x": 0,
+       "y": 100
+      }
+     }
+    ],
+    "content": {
+     "heading": "Plant Doctor",
+     "body": "drop a photo of a sick plant and an AI agent",
+     "fit": "fill"
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "ink",
+     "emphasis": 0.95
+    }
+   },
+   {
+    "id": "progress-stream",
+    "role": "diagnostic-progress",
+    "kind": "viz",
+    "frame": {
+     "x": 0,
+     "y": 120,
+     "w": 12,
+     "h": 58
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "leafSubject",
+      "at": {
+       "x": 2,
+       "y": 100
+      }
+     }
+    ],
+    "viz": {
+     "intent": "show AI agent processing steps",
+     "form": "vertical flowing line with pulsing nodes",
+     "render": [
+      {
+       "primitive": "flowLine",
+       "params": {
+        "nodes": 4,
+        "activeNode": 2
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Step 1",
+       "value": "upload"
+      },
+      {
+       "label": "Step 2",
+       "value": "analyzing"
+      },
+      {
+       "label": "Step 3",
+       "value": "done"
+      }
+     ]
+    },
+    "style": {
+     "surface": "glass",
+     "paletteRole": "accent",
+     "emphasis": 0.6
+    }
+   },
+   {
+    "id": "confidence-pin",
+    "role": "metric-annotation",
+    "kind": "viz",
+    "frame": {
+     "x": 85,
+     "y": 45,
+     "w": 14,
+     "h": 10
+    },
+    "z": 3,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "leafSubject",
+      "at": {
+       "x": 88,
+       "y": 50
+      }
+     }
+    ],
+    "viz": {
+     "intent": "show diagnosis confidence percentage",
+     "form": "value pinned to the leaf edge with a leader line",
+     "render": [
+      {
+       "primitive": "leaderCallout",
+       "params": {
+        "label": "98.4%"
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Confidence",
+       "value": "98.4%"
+      }
+     ]
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "neutral",
+     "emphasis": 0.8
+    }
+   },
+   {
+    "id": "anatomy-pin",
+    "role": "spatial-condition",
+    "kind": "viz",
+    "frame": {
+     "x": 25,
+     "y": 65,
+     "w": 16,
+     "h": 12
+    },
+    "z": 3,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "leafSubject",
+      "at": {
+       "x": 28,
+       "y": 70
+      }
+     }
+    ],
+    "viz": {
+     "intent": "show disease location and tissue damage",
+     "form": "magnified view pinned to the brown spot",
+     "render": [
+      {
+       "primitive": "ringSegment",
+       "params": {
+        "fraction": 0.95
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Location",
+       "value": "mid-vein"
+      }
+     ]
+    },
+    "style": {
+     "surface": "glass",
+     "paletteRole": "primary",
+     "emphasis": 0.7
+    }
+   },
+   {
+    "id": "severity-badge",
+    "role": "magnitude-indicator",
+    "kind": "panel",
+    "frame": {
+     "x": 0,
+     "y": 100,
+     "w": 28,
+     "h": 18
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "progress-stream",
+      "at": {
+       "x": 0,
+       "y": 100
+      }
+     }
+    ],
+    "content": {
+     "heading": "Severity",
+     "value": "Low",
+     "items": [
+      "Urgency: 2/10"
+     ]
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "neutral",
+     "emphasis": 0.5
+    }
+   },
+   {
+    "id": "agent-status",
+    "role": "system-health",
+    "kind": "viz",
+    "frame": {
+     "x": 0,
+     "y": 15,
+     "w": 10,
+     "h": 8
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "progress-stream",
+      "at": {
+       "x": 0,
+       "y": 100
+      }
+     }
+    ],
+    "viz": {
+     "intent": "indicate diagnostic agent status",
+     "form": "status ring",
+     "render": [
+      {
+       "primitive": "ringSegment",
+       "params": {
+        "fraction": 1
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Status",
+       "value": "Active"
+      }
+     ]
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "primary",
+     "emphasis": 0.6
+    }
+   },
+   {
+    "id": "treatment-plan",
+    "role": "step-by-step-guide",
+    "kind": "panel",
+    "frame": {
+     "x": 0,
+     "y": 16,
+     "w": 28,
+     "h": 45
+    },
+    "z": 2,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "progress-stream",
+      "at": {
+       "x": 0,
+       "y": 100
+      }
+     }
+    ],
+    "content": {
+     "items": [
+      "1. Remove affected leaf",
+      "2. Apply fungicide spray",
+      "3. Water lightly"
+     ]
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "neutral",
+     "emphasis": 0.7
+    }
+   },
+   {
+    "id": "footer-line",
+    "role": "footer-text",
+    "kind": "text",
+    "frame": {
+     "x": 0,
+     "y": 19,
+     "w": 100,
+     "h": 2
+    },
+    "z": 1,
+    "relations": [],
+    "content": {
+     "body": "© 2024 Plant Doctor AI. Clinical diagnosis guidance."
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "neutral",
+     "emphasis": 0.1
+    }
+   }
+  ]
+ },
+ "resolved": [
+  {
+   "id": "leafSubject",
+   "x": -547,
+   "y": -704,
+   "w": 1440,
+   "h": 2200,
+   "z": 1
+  },
+  {
+   "id": "footer-line",
+   "x": 0,
+   "y": 418,
+   "w": 1440,
+   "h": 44,
+   "z": 1
+  },
+  {
+   "id": "nav-ghost",
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 66,
+   "z": 2
+  },
+  {
+   "id": "headline-stream",
+   "x": -86,
+   "y": 1826,
+   "w": 173,
+   "h": 308,
+   "z": 2,
+   "attachPoint": {
+    "x": -547.2,
+    "y": 1496
+   }
+  },
+  {
+   "id": "progress-stream",
+   "x": -86,
+   "y": 1406,
+   "w": 173,
+   "h": 1276,
+   "z": 2,
+   "attachPoint": {
+    "x": -518.4000000000001,
+    "y": 1496
+   }
+  },
+  {
+   "id": "severity-badge",
+   "x": -94,
+   "y": 2002,
+   "w": 403,
+   "h": 396,
+   "z": 2,
+   "attachPoint": {
+    "x": -86.39999999999998,
+    "y": 2681.773115731298
+   }
+  },
+  {
+   "id": "agent-status",
+   "x": 43,
+   "y": 1929,
+   "w": 144,
+   "h": 176,
+   "z": 2,
+   "attachPoint": {
+    "x": -86.39999999999998,
+    "y": 2681.773115731298
+   }
+  },
+  {
+   "id": "treatment-plan",
+   "x": 121,
+   "y": 1287,
+   "w": 403,
+   "h": 990,
+   "z": 2,
+   "attachPoint": {
+    "x": -86.39999999999998,
+    "y": 2681.773115731298
+   }
+  },
+  {
+   "id": "confidence-pin",
+   "x": 996,
+   "y": 725,
+   "w": 202,
+   "h": 220,
+   "z": 3,
+   "attachPoint": {
+    "x": 720,
+    "y": 396
+   }
+  },
+  {
+   "id": "anatomy-pin",
+   "x": 116,
+   "y": 1144,
+   "w": 230,
+   "h": 264,
+   "z": 3,
+   "attachPoint": {
+    "x": -144,
+    "y": 836
+   }
+  }
+ ],
+ "canvas": {
+  "width": 1440,
+  "height": 2722
+ },
+ "adjustments": [
+  "headline-stream: pulled within reach of its anchor on leafSubject",
+  "progress-stream: pulled within reach of its anchor on leafSubject",
+  "confidence-pin: pulled within reach of its anchor on leafSubject",
+  "anatomy-pin: pulled within reach of its anchor on leafSubject",
+  "severity-badge: pulled within reach of its anchor on progress-stream",
+  "agent-status: pulled within reach of its anchor on progress-stream",
+  "treatment-plan: pulled within reach of its anchor on progress-stream",
+  "headline-stream: pulled back on-canvas (0% was visible)",
+  "progress-stream: pulled back on-canvas (0% was visible)",
+  "severity-badge: pulled back on-canvas (0% was visible)",
+  "agent-status: pulled back on-canvas (0% was visible)",
+  "treatment-plan: pulled back on-canvas (0% was visible)",
+  "agent-status: re-anchored to progress-stream's final position",
+  "agent-status: pulled back on-canvas (80% was visible)",
+  "treatment-plan: re-anchored to progress-stream's final position",
+  "treatment-plan: pulled back on-canvas (44% was visible)"
+ ]
+}

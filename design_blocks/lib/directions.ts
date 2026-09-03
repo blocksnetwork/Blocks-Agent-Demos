@@ -11,6 +11,7 @@ import type { BankEntry } from './bank.js';
 import { chat } from './qwen.js';
 import { parseColor, rgbToHsl, toHex, hslToRgb } from './color.js';
 import { deriveTokens, type DesignTokens } from './tokens.js';
+import { repairPalette } from './palette.js';
 import { genomeFor, type Genome } from './pagespec.js';
 
 export type Axis = 'faithful' | 'bolder' | 'unexpected';
@@ -141,7 +142,9 @@ function sanitizeSpec(
     axis,
     name: typeof spec.name === 'string' && spec.name ? spec.name.slice(0, 40) : fallback.name,
     adjectives: adjectives.length >= 2 ? adjectives : fallback.adjectives,
-    palette: palette.length >= 3 ? palette : fallback.palette,
+    // roles, not just colors: a photo-derived palette of five greys is
+    // repaired into ground / tint / mid / ink / accent around its own hue
+    palette: repairPalette(palette.length >= 3 ? palette : fallback.palette, genome.seed).palette,
     fontVibe: typeof spec.font_vibe === 'string' ? spec.font_vibe : fallback.fontVibe,
     // No embedded words, ever — the renderer owns all text.
     heroPrompt: `${heroPrompt.replace(/\b(text|typography|letters?|words?|logo)\b/gi, 'shapes')}, no text, no letters, no watermark`,

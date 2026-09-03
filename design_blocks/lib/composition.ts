@@ -33,6 +33,8 @@ import { transferBrief } from './analysis.js';
 import { STANCE_EXEMPLARS } from './exemplars.js';
 import type { ProductIntent } from './intent.js';
 import { chat, parseJsonReply } from './qwen.js';
+import { resolveLayout } from './resolve.js';
+import { assessQuality } from './quality.js';
 
 export type Stance = 'faithful' | 'bolder' | 'unexpected';
 
@@ -940,7 +942,16 @@ export async function generateComposition(
     }
     const result = sanitizeSpec(parsed, stance, analysis.refId);
     if (result && specUsable(result)) {
-      const validationErrors = validateSpecAgainstAnalysis(result.spec, analysis, intent);
+      // Two kinds of failure go back to the model verbatim: fidelity to
+      // the reference, and the absolute quality gate on the RESOLVED
+      // geometry (collisions, off-canvas, dead bands) — the same gate the
+      // handler applies before shipping, so a retry can fix what would
+      // otherwise be demoted.
+      const quality = assessQuality(result.spec, resolveLayout(result.spec));
+      const validationErrors = [
+        ...validateSpecAgainstAnalysis(result.spec, analysis, intent),
+        ...quality.failures.map((f) => `design quality: ${f}`),
+      ];
       const candidate: GeneratedComposition = { ...result, validationErrors, attempts: attempt };
       if (!best || candidate.validationErrors.length < best.validationErrors.length) best = candidate;
       if (validationErrors.length === 0) return candidate;
@@ -951,9 +962,9 @@ export async function generateComposition(
           {
             role: 'user',
             content:
-              'Your composition failed these structural checks against the reference:\n' +
+              'Your composition failed these checks (structural fidelity to the reference, and design quality on the resolved layout):\n' +
               validationErrors.map((e) => `- ${e}`).join('\n') +
-              '\nRegenerate the FULL JSON fixing every failure. Keep everything that already works.',
+              '\nRegenerate the FULL JSON fixing every failure. Text must never sit on other text; give every element room; keep everything that already works.',
           },
         );
       }

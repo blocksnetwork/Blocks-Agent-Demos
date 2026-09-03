@@ -128,6 +128,7 @@ export async function referenceHeroPng(
     `<feFuncB type="table" tableValues="${table('b', s)}"/>`,
     '</feComponentTransfer>',
     '</filter>',
+    '<filter id="soft" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0.7"/></filter>',
     '<linearGradient id="veil" x1="0" y1="0" x2="1" y2="1">',
     `<stop offset="0" stop-color="${hex(s.accent)}" stop-opacity="0.22"/>`,
     `<stop offset="1" stop-color="${hex(s.dark)}" stop-opacity="0.25"/>`,
@@ -135,6 +136,9 @@ export async function referenceHeroPng(
     '</defs>',
     `<rect width="${width}" height="${height}" fill="${hex(s.dark)}"/>`,
     `<image xlink:href="data:${mime};base64,${bytes.toString('base64')}" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice" filter="url(#map)"/>`,
+    // a third of the real photograph shows through, so the subject keeps
+    // its own colour and detail under the palette wash
+    `<image xlink:href="data:${mime};base64,${bytes.toString('base64')}" width="${width}" height="${height}" preserveAspectRatio="xMidYMid slice" filter="url(#soft)" opacity="0.34"/>`,
     `<rect width="${width}" height="${height}" fill="url(#veil)"/>`,
     '</svg>',
   ].join('');

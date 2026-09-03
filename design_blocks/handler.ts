@@ -12,6 +12,7 @@ import { renderStickers } from './lib/stickers.js';
 import { generateHero } from './lib/imagine.js';
 import { proceduralHeroPng, renderContactSheet, renderOgImage, renderTile } from './lib/comps.js';
 import { pickHeroReference, referenceHeroPng, type HeroSource } from './lib/hero.js';
+import { assessQuality, type QualityReport } from './lib/quality.js';
 import { buildThemeCss } from './lib/tokens.js';
 import { gatherAssets } from './lib/assets.js';
 import { parseColor } from './lib/color.js';
@@ -72,6 +73,7 @@ type DirectionOutcome = {
   analysis: DesignReferenceAnalysis | null;
   composition: GeneratedComposition | null;
   layout: ResolvedLayout | null;
+  quality: QualityReport | null;
   preview: { png: Uint8Array; svg: string } | null;
   structural: StructuralScore | null;
   craftProxies: CraftProxies | null;
@@ -316,8 +318,22 @@ export default async function handler(
   /* 5 — resolve layouts, generate one preview image per direction, render. */
   const outcomes: DirectionOutcome[] = [];
   for (let i = 0; i < specs.length; i++) {
-    const composition = compositions[i] ?? null;
-    const layout = composition ? resolveLayout(composition.spec) : null;
+    let composition = compositions[i] ?? null;
+    let layout = composition ? resolveLayout(composition.spec) : null;
+    // Absolute quality gate: a transferred composition that fails the
+    // plain reviewer rules (legible headline, nothing off-canvas, no text
+    // on text, imagery as subject, no dead bands) is demoted to the
+    // template path rather than shipped as a design.
+    let quality: QualityReport | null = null;
+    if (composition && layout) {
+      quality = assessQuality(composition.spec, layout);
+      if (!quality.ok) {
+        console.error(`[design-blocks] quality gate rejected ${stances[i]}: ${quality.failures.join(' | ')}`);
+        sheds.push(`direction ${stances[i]}: composition failed the quality gate (${quality.failures.slice(0, 3).join('; ')}) — template fallback`);
+        composition = null;
+        layout = null;
+      }
+    }
     outcomes.push({
       spec: specs[i],
       stance: stances[i],
@@ -325,6 +341,7 @@ export default async function handler(
       analysis: analyses[i],
       composition,
       layout,
+      quality,
       preview: null,
       structural: null,
       craftProxies: null,
@@ -517,11 +534,14 @@ export default async function handler(
       const revisedSpec = applyRevisionOps(winner.composition.spec, critique.ops, parentSizes);
       const revisedLayout = resolveLayout(revisedSpec);
       const revisedStructural = scoreStructure(revisedSpec, revisedLayout, winner.analysis);
-      const kept = revisedStructural.score >= (winner.structural?.score ?? 0);
+      const revisedQuality = assessQuality(revisedSpec, revisedLayout);
+      // a revision must clear the same gate the original did
+      const kept = revisedQuality.ok && revisedStructural.score >= (winner.structural?.score ?? 0);
       if (kept) {
         winner.composition = { ...winner.composition, spec: revisedSpec };
         winner.layout = revisedLayout;
         winner.structural = revisedStructural;
+        winner.quality = revisedQuality;
         winner.preview = (await rerender()) ?? winner.preview;
         ctx?.reportStatus(
           critique.topIssues[0]
@@ -616,6 +636,10 @@ export default async function handler(
     principlesUnverifiable: winner.structural?.principlesUnverifiable ?? [],
     structuralScore: winner.structural ? Number(winner.structural.score.toFixed(3)) : null,
     structuralParts: winner.structural?.parts ?? null,
+    qualityGate: winner.quality,
+    qualityGates: Object.fromEntries(
+      outcomes.map((o) => [o.stance, o.quality ? { ok: o.quality.ok, failures: o.quality.failures, metrics: o.quality.metrics } : null]),
+    ),
     craftProxies: Object.fromEntries(outcomes.map((o) => [o.stance, o.craftProxies])),
     specIntegrity: winner.composition?.integrity ?? null,
     specValidationErrors: winner.composition?.validationErrors ?? [],
@@ -637,7 +661,11 @@ export default async function handler(
     winner.compositionSource === 'reference-transfer'
       ? `Composition transferred from reference \`${winner.anchor?.id}\` (${winner.analysis?.summary ?? 'decomposed reference'}); ` +
         `${provenance.principlesSurviving.length}/${provenance.principles.length || provenance.principlesSurviving.length} principles verified in the render.`
-      : 'Composition came from the deterministic TEMPLATE FALLBACK (no usable reference decomposition was available).';
+      : `Composition came from the deterministic TEMPLATE FALLBACK (${
+          sheds.some((s) => s.includes('quality gate'))
+            ? 'the transferred compositions failed the quality gate — see kit.provenance.sheds'
+            : 'no usable reference decomposition was available'
+        }).`;
 
   const markdown = [
     `# Design direction — ${briefText || 'your app'}`,
