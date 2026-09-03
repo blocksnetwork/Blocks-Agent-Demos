@@ -202,7 +202,10 @@ export function pageGuidance(pageType: PageType): string {
         'one or two side panels (progress or agent stream, diagnosis or result, numbered steps) as panels with real items. ' +
         'Density is high: the first viewport is at least 70% covered by designed elements; panels align to a grid with consistent gaps; ' +
         'text lives inside panels, never floating alone in empty space; the biggest heading is a screen title, not a marketing headline; ' +
-        'no CTA row, no footer paragraph, no empty band anywhere.'
+        'no CTA row, no footer paragraph, no empty band anywhere. ' +
+        'Viz elements are compact instruments (no taller than 22% of the canvas) unless the viz IS the focal element; ' +
+        'a ranked list of candidates, evidence or steps is a panel with items, never a bar chart. ' +
+        'Panel headings are short (at most 3 words) so they never wrap into the body; the screen title is one line.'
       );
     case 'dashboard':
       return (

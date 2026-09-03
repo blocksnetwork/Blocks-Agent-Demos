@@ -268,6 +268,9 @@ function textContent(resolved: ResolvedElement, t: DesignTokens): Child[] {
           fontSize: fill ? fillFontSize(content.heading, resolved.w, resolved.h) : Math.round(20 + emphasis * 34),
           lineHeight: 1.04,
           letterSpacing: -1,
+          // a wrapped heading must keep its full height — Yoga would
+          // otherwise shrink it and the body would draw over line two
+          flexShrink: 0,
           // declared line breaks in fill headings are design decisions
           ...(fill ? { whiteSpace: 'pre-line' } : {}),
         },
@@ -279,7 +282,7 @@ function textContent(resolved: ResolvedElement, t: DesignTokens): Child[] {
     out.push(
       el(
         'div',
-        { fontSize: 16, color: t.muted, lineHeight: 1.55, marginTop: content.heading ? 10 : 0 },
+        { fontSize: 16, color: t.muted, lineHeight: 1.55, marginTop: content.heading ? 10 : 0, flexShrink: 0 },
         content.body,
       ),
     );
@@ -288,7 +291,7 @@ function textContent(resolved: ResolvedElement, t: DesignTokens): Child[] {
     out.push(
       el(
         'div',
-        { flexDirection: 'column', marginTop: 6 },
+        { flexDirection: 'column', marginTop: 6, flexShrink: 0 },
         ...(content.label
           ? [el('div', { fontSize: 12, color: t.muted, textTransform: 'uppercase', letterSpacing: 1.6 }, content.label)]
           : []),
@@ -302,7 +305,7 @@ function textContent(resolved: ResolvedElement, t: DesignTokens): Child[] {
     out.push(
       el(
         'div',
-        { flexDirection: 'column', marginTop: 8 },
+        { flexDirection: 'column', marginTop: 8, flexShrink: 0 },
         ...content.items.slice(0, 6).map((item, i) =>
           el(
             'div',

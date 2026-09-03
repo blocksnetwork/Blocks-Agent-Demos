@@ -78,7 +78,12 @@ function isTextLike(e: CompElement): boolean {
   return e.kind === 'text' || (e.kind === 'panel' && Boolean(e.content?.heading || e.content?.body || e.content?.items?.length));
 }
 
-export function assessQuality(spec: CompositionSpec, layout: ResolvedLayout): QualityReport {
+export type QualityOptions = {
+  /** app screens and dashboards carry a screen title, not display type — the headline floor drops */
+  pageType?: string;
+};
+
+export function assessQuality(spec: CompositionSpec, layout: ResolvedLayout, opts: QualityOptions = {}): QualityReport {
   const failures: string[] = [];
   const warnings: string[] = [];
   const canvas: Box = { x: 0, y: 0, w: layout.canvas.width, h: layout.canvas.height };
@@ -107,8 +112,9 @@ export function assessQuality(spec: CompositionSpec, layout: ResolvedLayout): Qu
   const headlines = resolved.filter((r) => r.element.kind === 'text' && r.element.content?.heading);
   if (headlines.length === 0) failures.push('no text element carries a heading');
   const widest = headlines.sort((a, b) => b.w - a.w)[0];
-  if (widest && widest.w < canvas.w * 0.2) {
-    failures.push(`the widest headline (${widest.element.id}) is only ${Math.round((widest.w / canvas.w) * 100)}% of the canvas wide — display type needs at least 20%`);
+  const headlineFloor = opts.pageType === 'app-screen' || opts.pageType === 'dashboard' ? 0.12 : 0.2;
+  if (widest && widest.w < canvas.w * headlineFloor) {
+    failures.push(`the widest headline (${widest.element.id}) is only ${Math.round((widest.w / canvas.w) * 100)}% of the canvas wide — display type needs at least ${Math.round(headlineFloor * 100)}%`);
   }
   for (const r of headlines) {
     if (r.w < 120 || r.h < 32) failures.push(`${r.element.id} is a ${Math.round(r.w)}×${Math.round(r.h)}px heading — unreadable at that size`);

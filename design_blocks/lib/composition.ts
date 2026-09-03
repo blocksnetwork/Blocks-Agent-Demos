@@ -953,7 +953,7 @@ export async function generateComposition(
       // geometry (collisions, off-canvas, dead bands) — the same gate the
       // handler applies before shipping, so a retry can fix what would
       // otherwise be demoted.
-      const quality = assessQuality(result.spec, resolveLayout(result.spec));
+      const quality = assessQuality(result.spec, resolveLayout(result.spec), { pageType: contentSeed.pageType });
       const validationErrors = [
         ...validateSpecAgainstAnalysis(result.spec, analysis, intent),
         ...quality.failures.map((f) => `design quality: ${f}`),

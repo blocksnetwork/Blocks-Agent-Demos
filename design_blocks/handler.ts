@@ -13,6 +13,7 @@ import { generateHero } from './lib/imagine.js';
 import { proceduralHeroPng, renderContactSheet, renderOgImage, renderTile } from './lib/comps.js';
 import { pickHeroReference, referenceHeroPng, type HeroSource } from './lib/hero.js';
 import { curateReferences, pageGuidance, type Curation } from './lib/curate.js';
+import { claudeEnabled } from './lib/claude.js';
 import { assessQuality, type QualityReport } from './lib/quality.js';
 import { buildThemeCss } from './lib/tokens.js';
 import { gatherAssets } from './lib/assets.js';
@@ -349,7 +350,13 @@ export default async function handler(
     });
   };
   const compositions: Array<GeneratedComposition | null> = [];
-  for (let i = 0; i < stances.length; i++) compositions.push(await generateFor(i));
+  if (claudeEnabled()) {
+    // Hosted authoring has no shared GPU to protect, and one direction
+    // takes 2-4 minutes — sequential meant the third was always shed.
+    compositions.push(...(await Promise.all(stances.map((_, i) => generateFor(i)))));
+  } else {
+    for (let i = 0; i < stances.length; i++) compositions.push(await generateFor(i));
+  }
 
   /* 5 — resolve layouts, generate one preview image per direction, render. */
   const outcomes: DirectionOutcome[] = [];
@@ -362,7 +369,7 @@ export default async function handler(
     // template path rather than shipped as a design.
     let quality: QualityReport | null = null;
     if (composition && layout) {
-      quality = assessQuality(composition.spec, layout);
+      quality = assessQuality(composition.spec, layout, { pageType: curation?.pageType });
       if (!quality.ok) {
         console.error(`[design-blocks] quality gate rejected ${stances[i]}: ${quality.failures.join(' | ')}`);
         sheds.push(`direction ${stances[i]}: composition failed the quality gate (${quality.failures.slice(0, 3).join('; ')}) — template fallback`);
@@ -576,7 +583,7 @@ export default async function handler(
       const revisedSpec = applyRevisionOps(winner.composition.spec, critique.ops, parentSizes);
       const revisedLayout = resolveLayout(revisedSpec);
       const revisedStructural = scoreStructure(revisedSpec, revisedLayout, winner.analysis);
-      const revisedQuality = assessQuality(revisedSpec, revisedLayout);
+      const revisedQuality = assessQuality(revisedSpec, revisedLayout, { pageType: curation?.pageType });
       // a revision must clear the same gate the original did
       const kept = revisedQuality.ok && revisedStructural.score >= (winner.structural?.score ?? 0);
       if (kept) {
