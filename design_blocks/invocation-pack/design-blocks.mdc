@@ -20,16 +20,29 @@ the blocks-network MCP server:
    `theme_css` + `motion_css` + `motion_js` (styling and micro-animation
    kit), `stickers` (floating SVG components), `kit`, `hero`/`og` PNGs.
 
-3. THE BLUEPRINT IS THE PAGE — build it section by section with its exact
-   numbers; it outranks your layout habits. Link theme, then motion css,
-   then motion js (defer). Inline sticker SVGs as the blueprint's floating
-   elements with data-float; add data-reveal / data-reveal-group where the
-   blueprint says. Save hero/og into public/ and wire them.
+3. Gate: read `kit.provenance`. If `compositionSource` is
+   `template-fallback`, `qualityGate.ok` is false, or `curation` is null,
+   stop and re-brief with a sharper goal (page type, what the user looks
+   at, what must be on screen) instead of building a fallback.
 
-4. Never: a centered gradient-card hero unless the blueprint says so,
-   three identical boxes in a row, shrunken display type, ad-hoc
-   keyframes, or emoji as icons. The motion kit is the only animation
-   source; the stickers are the produced look — use them.
+4. The comp is a DIRECTION from a mechanical compositor, not a finished
+   page. Take its skeleton, hierarchy, palette roles, imagery treatment
+   and type pairing; do not copy clipped headings, placeholder charts or
+   bar charts standing in for lists. Derive a system first — 8px spacing,
+   a type scale (screen title 28-36px, panel title 18-20px, body 15-16px,
+   labels 11-12px uppercase tracked, tabular numbers), tokens for every
+   colour with one accent at ~10%, hairline borders, two elevation
+   levels — then build to `kit.provenance.curation.pageType`: an app
+   screen is a shell + subject + same-anatomy panels + pinned markers +
+   real states; a landing page is a thesis hero + blueprint sections.
+   Link theme, then motion css, then motion js (defer); save hero/og into
+   public/ and keep the hero credit visible. Real copy, never lorem.
 
-4. Mention which references were matched so the user can steer — a new
-   `vibe` in the next brief re-aims the direction.
+5. Review at 1440 and 390 before saying done: nothing clipped, no text on
+   text, no empty panel, skeleton matches the comp, one accent, titles on
+   one line, first viewport full and scannable in three seconds.
+
+6. Never: a centered gradient-card hero, three identical boxes in a row,
+   framework-default fonts, emoji as icons, ad-hoc keyframes, or building
+   a fallback tile as if it were a design. Mention which references were
+   matched and why (the kit's curation reasons) so the user can steer.
