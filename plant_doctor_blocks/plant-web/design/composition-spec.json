@@ -3,358 +3,460 @@
   "version": 1,
   "canvas": {
    "width": 1440,
-   "height": 2200
+   "height": 1320
   },
-  "focalElementId": "leafSubject",
-  "planes": 2,
+  "focalElementId": "leaf-photo",
+  "planes": 3,
   "principles": [
-   "dominant mass anchors top-left with high-contrast green texture",
-   "organic irregular boundaries replace rigid grids to mimic cellular structure",
-   "diagnostic data pins directly onto the leaf anatomy rather than floating panels",
-   "vertical flow line carries the headline and progress stream down the left edge",
-   "density fills the entire canvas height with no empty bands"
+   "switch axis systems mid-screen: a calm three-part verdict band above, an asymmetric rail-plus-exhibit block below",
+   "crop the primary artifact at the frame edge so the exhibit implies continuation",
+   "insert a control strip between the verdict band and the exhibit so the photo reads as interactive apparatus, not decoration",
+   "every quantitative unit runs label → magnitude → interpretation → context so the screen scans as one table",
+   "freeze an interaction state (agent mid-step) into the still layout to prove liveness",
+   "near-monochrome surfaces; one saturated marker dot carries hierarchy signalling"
   ],
   "source": {
-   "referenceId": "18aa5bbbad4a",
+   "referenceId": "18669de92ad6",
    "stance": "faithful",
    "signaturePatternsUsed": [
-    "dominant top-left mass",
-    "organic irregular boundaries",
-    "pinned diagnostic data",
-    "vertical flow line"
+    "Insert a control strip between the narrative section and the exhibit so the exhibit reads as interactive apparatus, not decoration",
+    "Crop the primary artifact at the frame edge so the composition implies continuation and invites scroll instead of resolving",
+    "Give every quantitative unit a fixed vertical rhythm of label → magnitude → interpretation → context so a grid of them scans as one table",
+    "Switch axis systems mid-page — a centered block above, an asymmetric rail-plus-content block below — to mark a change from message to evidence",
+    "Freeze an interaction state into the still layout to prove liveness without motion"
    ]
   },
   "elements": [
    {
-    "id": "nav-ghost",
-    "role": "navigation",
+    "id": "topbar",
+    "role": "app top bar",
     "kind": "group",
     "frame": {
      "x": 0,
      "y": 0,
      "w": 100,
-     "h": 3
+     "h": 5
     },
-    "z": 2,
+    "z": 3,
+    "relations": [],
+    "style": {
+     "surface": "solid",
+     "paletteRole": "surface",
+     "emphasis": 0.5
+    }
+   },
+   {
+    "id": "brand",
+    "role": "product name",
+    "kind": "text",
+    "parent": "topbar",
+    "frame": {
+     "x": 2,
+     "y": 22,
+     "w": 24,
+     "h": 56
+    },
+    "z": 3,
+    "relations": [],
+    "content": {
+     "heading": "Plant Doctor"
+    },
+    "style": {}
+   },
+   {
+    "id": "nav-links",
+    "role": "nav links",
+    "kind": "text",
+    "parent": "topbar",
+    "frame": {
+     "x": 48,
+     "y": 26,
+     "w": 50,
+     "h": 48
+    },
+    "z": 3,
     "relations": [],
     "content": {
      "items": [
-      "upload",
-      "history",
-      "settings"
+      "Scans",
+      "Library",
+      "Care log",
+      "Re-diagnose"
      ]
     },
-    "style": {
-     "surface": "outline",
-     "paletteRole": "neutral",
-     "emphasis": 0.05
-    }
+    "style": {}
    },
    {
-    "id": "leafSubject",
-    "role": "primary-subject",
-    "kind": "image",
-    "frame": {
-     "x": -38,
-     "y": -32,
-     "w": 100,
-     "h": 100
-    },
-    "z": 1,
-    "relations": [],
-    "imagery": {
-     "subject": "macro closeup of a healthy green leaf with a single subtle brown necrotic spot, cellular texture visible, soft directional lighting casting deep shadows within the veins",
-     "integration": "cutout",
-     "surface": "texture",
-     "mask": "none"
-    },
-    "style": {
-     "surface": "solid",
-     "paletteRole": "primary",
-     "emphasis": 0.9
-    }
-   },
-   {
-    "id": "headline-stream",
-    "role": "headline-in-flow",
+    "id": "screen-title",
+    "role": "screen title and specimen line",
     "kind": "text",
     "frame": {
-     "x": 0,
-     "y": 105,
-     "w": 12,
-     "h": 14
+     "x": 3,
+     "y": 7,
+     "w": 29,
+     "h": 12
     },
     "z": 2,
-    "relations": [
-     {
-      "type": "attachedTo",
-      "target": "leafSubject",
-      "at": {
-       "x": 0,
-       "y": 100
-      }
-     }
-    ],
+    "relations": [],
     "content": {
-     "heading": "Plant Doctor",
-     "body": "drop a photo of a sick plant and an AI agent",
+     "heading": "Leaf scan — Ficus lyrata",
+     "label": "IMG_2291 · 14:06 · north window",
      "fit": "fill"
+    },
+    "style": {}
+   },
+   {
+    "id": "diagnosis",
+    "role": "primary diagnosis verdict",
+    "kind": "panel",
+    "frame": {
+     "x": 34,
+     "y": 7,
+     "w": 34,
+     "h": 12
+    },
+    "z": 2,
+    "relations": [],
+    "content": {
+     "heading": "Septoria leaf spot",
+     "body": "Fungal spotting spread by water splashing onto lower leaves.",
+     "label": "primary diagnosis"
     },
     "style": {
      "surface": "solid",
      "paletteRole": "ink",
-     "emphasis": 0.95
+     "emphasis": 0.9
     }
    },
    {
-    "id": "progress-stream",
-    "role": "diagnostic-progress",
+    "id": "confidence",
+    "role": "certainty instrument",
     "kind": "viz",
     "frame": {
-     "x": 0,
-     "y": 120,
-     "w": 12,
-     "h": 58
-    },
-    "z": 2,
-    "relations": [
-     {
-      "type": "attachedTo",
-      "target": "leafSubject",
-      "at": {
-       "x": 2,
-       "y": 100
-      }
-     }
-    ],
-    "viz": {
-     "intent": "show AI agent processing steps",
-     "form": "vertical flowing line with pulsing nodes",
-     "render": [
-      {
-       "primitive": "flowLine",
-       "params": {
-        "nodes": 4,
-        "activeNode": 2
-       }
-      }
-     ],
-     "values": [
-      {
-       "label": "Step 1",
-       "value": "upload"
-      },
-      {
-       "label": "Step 2",
-       "value": "analyzing"
-      },
-      {
-       "label": "Step 3",
-       "value": "done"
-      }
-     ]
-    },
-    "style": {
-     "surface": "glass",
-     "paletteRole": "accent",
-     "emphasis": 0.6
-    }
-   },
-   {
-    "id": "confidence-pin",
-    "role": "metric-annotation",
-    "kind": "viz",
-    "frame": {
-     "x": 85,
-     "y": 45,
-     "w": 14,
-     "h": 10
-    },
-    "z": 3,
-    "relations": [
-     {
-      "type": "attachedTo",
-      "target": "leafSubject",
-      "at": {
-       "x": 88,
-       "y": 50
-      }
-     }
-    ],
-    "viz": {
-     "intent": "show diagnosis confidence percentage",
-     "form": "value pinned to the leaf edge with a leader line",
-     "render": [
-      {
-       "primitive": "leaderCallout",
-       "params": {
-        "label": "98.4%"
-       }
-      }
-     ],
-     "values": [
-      {
-       "label": "Confidence",
-       "value": "98.4%"
-      }
-     ]
-    },
-    "style": {
-     "surface": "solid",
-     "paletteRole": "neutral",
-     "emphasis": 0.8
-    }
-   },
-   {
-    "id": "anatomy-pin",
-    "role": "spatial-condition",
-    "kind": "viz",
-    "frame": {
-     "x": 25,
-     "y": 65,
-     "w": 16,
+     "x": 62,
+     "y": 7,
+     "w": 31,
      "h": 12
     },
     "z": 3,
     "relations": [
      {
-      "type": "attachedTo",
-      "target": "leafSubject",
-      "at": {
-       "x": 28,
-       "y": 70
-      }
+      "type": "overlaps",
+      "target": "diagnosis",
+      "amount": 0.07,
+      "side": "left"
      }
     ],
     "viz": {
-     "intent": "show disease location and tissue damage",
-     "form": "magnified view pinned to the brown spot",
+     "intent": "communicate certainty of the primary diagnosis at a glance",
+     "form": "open ring with the percentage set large inside it and a context caption beneath",
      "render": [
       {
        "primitive": "ringSegment",
        "params": {
-        "fraction": 0.95
+        "fraction": 0.87,
+        "thickness": 0.14
        }
       }
      ],
      "values": [
       {
-       "label": "Location",
-       "value": "mid-vein"
+       "label": "confidence",
+       "value": "87%"
+      },
+      {
+       "label": "markers matched",
+       "value": "4 of 5"
       }
      ]
     },
     "style": {
-     "surface": "glass",
-     "paletteRole": "primary",
-     "emphasis": 0.7
+     "surface": "outline",
+     "paletteRole": "accent"
     }
    },
    {
-    "id": "severity-badge",
-    "role": "magnitude-indicator",
-    "kind": "panel",
+    "id": "view-tabs",
+    "role": "control strip between verdict band and exhibit",
+    "kind": "text",
     "frame": {
-     "x": 0,
-     "y": 100,
-     "w": 28,
-     "h": 18
+     "x": 3,
+     "y": 21,
+     "w": 94,
+     "h": 7
     },
-    "z": 2,
-    "relations": [
-     {
-      "type": "attachedTo",
-      "target": "progress-stream",
-      "at": {
-       "x": 0,
-       "y": 100
-      }
-     }
-    ],
+    "z": 3,
+    "relations": [],
     "content": {
-     "heading": "Severity",
-     "value": "Low",
      "items": [
-      "Urgency: 2/10"
+      "Evidence",
+      "Overlay mask",
+      "Differential",
+      "Zoom 1.4×",
+      "Compare last scan"
      ]
     },
     "style": {
-     "surface": "solid",
+     "surface": "outline",
      "paletteRole": "neutral",
-     "emphasis": 0.5
+     "emphasis": 0.4
     }
    },
    {
-    "id": "agent-status",
-    "role": "system-health",
-    "kind": "viz",
+    "id": "leaf-photo",
+    "role": "primary-subject: uploaded leaf photo work area",
+    "kind": "image",
     "frame": {
-     "x": 0,
-     "y": 15,
-     "w": 10,
-     "h": 8
-    },
-    "z": 2,
-    "relations": [
-     {
-      "type": "attachedTo",
-      "target": "progress-stream",
-      "at": {
-       "x": 0,
-       "y": 100
-      }
-     }
-    ],
-    "viz": {
-     "intent": "indicate diagnostic agent status",
-     "form": "status ring",
-     "render": [
-      {
-       "primitive": "ringSegment",
-       "params": {
-        "fraction": 1
-       }
-      }
-     ],
-     "values": [
-      {
-       "label": "Status",
-       "value": "Active"
-      }
-     ]
-    },
-    "style": {
-     "surface": "solid",
-     "paletteRole": "primary",
-     "emphasis": 0.6
-    }
-   },
-   {
-    "id": "treatment-plan",
-    "role": "step-by-step-guide",
-    "kind": "panel",
-    "frame": {
-     "x": 0,
-     "y": 16,
-     "w": 28,
+     "x": 40,
+     "y": 27,
+     "w": 62,
      "h": 45
     },
     "z": 2,
     "relations": [
      {
-      "type": "attachedTo",
-      "target": "progress-stream",
-      "at": {
-       "x": 0,
-       "y": 100
-      }
+      "type": "breaksContainer",
+      "side": "right",
+      "amount": 0.12
      }
     ],
+    "imagery": {
+     "subject": "macro photograph of one fiddle-leaf fig leaf with dark brown necrotic spots ringed by yellow halos, clinical flat lighting, neutral grey backdrop",
+     "integration": "contained",
+     "surface": "texture",
+     "mask": "none"
+    },
     "content": {
+     "label": "4032×3024 · overlay on"
+    },
+    "style": {}
+   },
+   {
+    "id": "marker-a",
+    "role": "evidence marker pinned to lesion",
+    "kind": "viz",
+    "frame": {
+     "x": 43,
+     "y": 32,
+     "w": 17,
+     "h": 7
+    },
+    "z": 3,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "leaf-photo",
+      "at": {
+       "x": 24,
+       "y": 34
+      }
+     },
+     {
+      "type": "overlaps",
+      "target": "leaf-photo",
+      "amount": 0.85,
+      "side": "left"
+     }
+    ],
+    "viz": {
+     "intent": "locate symptoms directly on the plant photo",
+     "form": "saturated dot on the lesion with a leader line to a compact readout",
+     "render": [
+      {
+       "primitive": "leaderCallout",
+       "params": {
+        "dot": true
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "necrotic center",
+       "value": "4mm"
+      }
+     ]
+    },
+    "style": {
+     "surface": "glass",
+     "paletteRole": "accent"
+    }
+   },
+   {
+    "id": "marker-b",
+    "role": "evidence marker pinned to leaf margin",
+    "kind": "viz",
+    "frame": {
+     "x": 80,
+     "y": 57,
+     "w": 18,
+     "h": 7
+    },
+    "z": 3,
+    "relations": [
+     {
+      "type": "attachedTo",
+      "target": "leaf-photo",
+      "at": {
+       "x": 62,
+       "y": 74
+      }
+     },
+     {
+      "type": "overlaps",
+      "target": "leaf-photo",
+      "amount": 0.8,
+      "side": "right"
+     }
+    ],
+    "viz": {
+     "intent": "locate symptoms directly on the plant photo",
+     "form": "dot on the chlorotic margin with a leader line to a compact readout",
+     "render": [
+      {
+       "primitive": "leaderCallout",
+       "params": {
+        "dot": true
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "chlorotic halo",
+       "value": "9 sites"
+      }
+     ]
+    },
+    "style": {
+     "surface": "glass",
+     "paletteRole": "accent"
+    }
+   },
+   {
+    "id": "agent-stream",
+    "role": "live agent reasoning rail",
+    "kind": "viz",
+    "frame": {
+     "x": 3,
+     "y": 27,
+     "w": 34,
+     "h": 20
+    },
+    "z": 3,
+    "relations": [],
+    "viz": {
+     "intent": "communicate progress of the agent's live analysis run",
+     "form": "vertical step list, filled dots for finished steps and one live dot on the running step, elapsed time in the header",
+     "render": [
+      {
+       "primitive": "dotField",
+       "params": {
+        "rows": 5,
+        "cols": 1,
+        "filled": 4,
+        "active": 5
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "segment leaf mask",
+       "value": "done"
+      },
+      {
+       "label": "detect lesion clusters",
+       "value": "done"
+      },
+      {
+       "label": "measure halo ratio",
+       "value": "done"
+      },
+      {
+       "label": "match spore pattern",
+       "value": "done"
+      },
+      {
+       "label": "rank differentials",
+       "value": "running 12.4s"
+      }
+     ]
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "surface",
+     "emphasis": 0.6
+    }
+   },
+   {
+    "id": "differential",
+    "role": "ranked competing conditions",
+    "kind": "viz",
+    "frame": {
+     "x": 3,
+     "y": 49,
+     "w": 34,
+     "h": 23
+    },
+    "z": 3,
+    "relations": [],
+    "viz": {
+     "intent": "compare magnitudes — rank competing explanations against each other",
+     "form": "ranked rows, each a label with a hairline likelihood bar and the score at the row end",
+     "render": [
+      {
+       "primitive": "barColumn",
+       "params": {
+        "orientation": "horizontal",
+        "rows": 4,
+        "hairline": true
+       }
+      }
+     ],
+     "values": [
+      {
+       "label": "Septoria leaf spot",
+       "value": "87"
+      },
+      {
+       "label": "Bacterial leaf spot",
+       "value": "41"
+      },
+      {
+       "label": "Overwatering edema",
+       "value": "23"
+      },
+      {
+       "label": "Spider mite damage",
+       "value": "11"
+      }
+     ]
+    },
+    "style": {
+     "surface": "solid",
+     "paletteRole": "surface",
+     "emphasis": 0.55
+    }
+   },
+   {
+    "id": "treatment",
+    "role": "numbered treatment plan",
+    "kind": "panel",
+    "frame": {
+     "x": 3,
+     "y": 74,
+     "w": 95,
+     "h": 18
+    },
+    "z": 3,
+    "relations": [],
+    "content": {
+     "heading": "Do this next",
+     "label": "treatment plan · 14 days",
      "items": [
-      "1. Remove affected leaf",
-      "2. Apply fungicide spray",
-      "3. Water lightly"
+      "1 · Remove spotted leaves today — sterile shears, bin, do not compost",
+      "2 · Water at soil only, morning — no misting for 14 days",
+      "3 · Copper fungicide spray day 2 and day 9 — 5ml per litre",
+      "4 · Move 40cm from the window, run a small fan 4h daily",
+      "5 · Re-scan day 10 to compare lesion count"
      ]
     },
     "style": {
@@ -364,158 +466,151 @@
     }
    },
    {
-    "id": "footer-line",
-    "role": "footer-text",
+    "id": "provenance",
+    "role": "provenance line",
     "kind": "text",
     "frame": {
-     "x": 0,
-     "y": 19,
-     "w": 100,
-     "h": 2
+     "x": 3,
+     "y": 96,
+     "w": 70,
+     "h": 3
     },
     "z": 1,
     "relations": [],
     "content": {
-     "body": "© 2024 Plant Doctor AI. Clinical diagnosis guidance."
+     "body": "agent pd-4 on Blocks network · model run 12.4s · re-diagnose"
     },
-    "style": {
-     "surface": "solid",
-     "paletteRole": "neutral",
-     "emphasis": 0.1
-    }
+    "style": {}
    }
   ]
  },
  "resolved": [
   {
-   "id": "leafSubject",
-   "x": -547,
-   "y": -704,
-   "w": 1440,
-   "h": 2200,
+   "id": "provenance",
+   "x": 43,
+   "y": 1267,
+   "w": 1008,
+   "h": 40,
    "z": 1
   },
   {
-   "id": "footer-line",
-   "x": 0,
-   "y": 418,
-   "w": 1440,
-   "h": 44,
-   "z": 1
+   "id": "screen-title",
+   "x": 43,
+   "y": 92,
+   "w": 418,
+   "h": 158,
+   "z": 2
   },
   {
-   "id": "nav-ghost",
+   "id": "diagnosis",
+   "x": 490,
+   "y": 92,
+   "w": 490,
+   "h": 158,
+   "z": 2
+  },
+  {
+   "id": "leaf-photo",
+   "x": 654,
+   "y": 356,
+   "w": 893,
+   "h": 594,
+   "z": 2
+  },
+  {
+   "id": "topbar",
    "x": 0,
    "y": 0,
    "w": 1440,
    "h": 66,
-   "z": 2
+   "z": 3
   },
   {
-   "id": "headline-stream",
-   "x": -86,
-   "y": 1826,
-   "w": 173,
-   "h": 308,
-   "z": 2,
-   "attachPoint": {
-    "x": -547.2,
-    "y": 1496
-   }
+   "id": "confidence",
+   "x": 893,
+   "y": 92,
+   "w": 446,
+   "h": 158,
+   "z": 3
   },
   {
-   "id": "progress-stream",
-   "x": -86,
-   "y": 1406,
-   "w": 173,
-   "h": 1276,
-   "z": 2,
-   "attachPoint": {
-    "x": -518.4000000000001,
-    "y": 1496
-   }
-  },
-  {
-   "id": "severity-badge",
-   "x": -94,
-   "y": 2002,
-   "w": 403,
-   "h": 396,
-   "z": 2,
-   "attachPoint": {
-    "x": -86.39999999999998,
-    "y": 2681.773115731298
-   }
-  },
-  {
-   "id": "agent-status",
+   "id": "view-tabs",
    "x": 43,
-   "y": 1929,
-   "w": 144,
-   "h": 176,
-   "z": 2,
-   "attachPoint": {
-    "x": -86.39999999999998,
-    "y": 2681.773115731298
-   }
+   "y": 277,
+   "w": 1354,
+   "h": 92,
+   "z": 3
   },
   {
-   "id": "treatment-plan",
-   "x": 121,
-   "y": 1287,
-   "w": 403,
-   "h": 990,
-   "z": 2,
-   "attachPoint": {
-    "x": -86.39999999999998,
-    "y": 2681.773115731298
-   }
-  },
-  {
-   "id": "confidence-pin",
-   "x": 996,
-   "y": 725,
-   "w": 202,
-   "h": 220,
+   "id": "marker-a",
+   "x": 619,
+   "y": 422,
+   "w": 245,
+   "h": 92,
    "z": 3,
    "attachPoint": {
-    "x": 720,
-    "y": 396
+    "x": 868.608,
+    "y": 558.36
    }
   },
   {
-   "id": "anatomy-pin",
-   "x": 116,
-   "y": 1144,
-   "w": 230,
+   "id": "marker-b",
+   "x": 1152,
+   "y": 752,
+   "w": 259,
+   "h": 92,
+   "z": 3,
+   "attachPoint": {
+    "x": 1207.8719999999998,
+    "y": 795.96
+   }
+  },
+  {
+   "id": "agent-stream",
+   "x": 43,
+   "y": 356,
+   "w": 490,
    "h": 264,
-   "z": 3,
-   "attachPoint": {
-    "x": -144,
-    "y": 836
-   }
+   "z": 3
+  },
+  {
+   "id": "differential",
+   "x": 43,
+   "y": 647,
+   "w": 490,
+   "h": 304,
+   "z": 3
+  },
+  {
+   "id": "treatment",
+   "x": 43,
+   "y": 977,
+   "w": 1368,
+   "h": 238,
+   "z": 3
+  },
+  {
+   "id": "brand",
+   "x": 29,
+   "y": 15,
+   "w": 346,
+   "h": 37,
+   "z": 3
+  },
+  {
+   "id": "nav-links",
+   "x": 691,
+   "y": 17,
+   "w": 720,
+   "h": 32,
+   "z": 3
   }
  ],
  "canvas": {
   "width": 1440,
-  "height": 2722
+  "height": 1320
  },
  "adjustments": [
-  "headline-stream: pulled within reach of its anchor on leafSubject",
-  "progress-stream: pulled within reach of its anchor on leafSubject",
-  "confidence-pin: pulled within reach of its anchor on leafSubject",
-  "anatomy-pin: pulled within reach of its anchor on leafSubject",
-  "severity-badge: pulled within reach of its anchor on progress-stream",
-  "agent-status: pulled within reach of its anchor on progress-stream",
-  "treatment-plan: pulled within reach of its anchor on progress-stream",
-  "headline-stream: pulled back on-canvas (0% was visible)",
-  "progress-stream: pulled back on-canvas (0% was visible)",
-  "severity-badge: pulled back on-canvas (0% was visible)",
-  "agent-status: pulled back on-canvas (0% was visible)",
-  "treatment-plan: pulled back on-canvas (0% was visible)",
-  "agent-status: re-anchored to progress-stream's final position",
-  "agent-status: pulled back on-canvas (80% was visible)",
-  "treatment-plan: re-anchored to progress-stream's final position",
-  "treatment-plan: pulled back on-canvas (44% was visible)"
+  "leaf-photo: pushed 12% past its container's right edge"
  ]
 }

@@ -1,5 +1,7 @@
-/* Design Blocks theme — link this last, after your existing styles. */
-@import url('https://fonts.bunny.net/css?family=fraunces:600,700|inter:400,500,600&display=swap');
+/* Design Blocks theme — design_blocks task 231582df ("Night Lab").
+   Verbatim from design/design-theme.css except that the Bunny @import is
+   replaced by the @fontsource packages imported in layout.tsx
+   (tokens.fonts.fontsourceInstall), so the fonts ship with the build. */
 
 :root {
   --design-primary: #199f4f;
@@ -11,7 +13,7 @@
   --design-muted: #6e6e78;
   --design-border: #e4e4e7;
   --design-radius: 10px;
-  --design-font-display: 'Fraunces', system-ui, sans-serif;
+  --design-font-display: 'Fraunces', Georgia, serif;
   --design-font-body: 'Inter', system-ui, sans-serif;
   --design-space-1: 4px;
   --design-space-2: 8px;

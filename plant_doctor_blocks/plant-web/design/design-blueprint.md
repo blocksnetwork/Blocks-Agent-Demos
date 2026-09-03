@@ -1,113 +1,134 @@
-# Composition blueprint — Textured Botanical
+# Composition blueprint — Night Lab
 
-Brief: Plant Doctor — drop a photo of a sick plant and an AI agent on the Blocks network diagnoses it: the page shows the photo, streams the agent's progress, then presents the diagnosis with confidence, visual evidence pinned to the leaf, and a numbered treatment plan. One-screen web app, not a marketing page. — botanical, clinical calm, editorial, warm daylight, trustworthy — Next.js + Tailwind 4
-Transferred from reference: A macro shot of a textured, cellular surface transitioning from matte green at the top to metallic silver at the bottom.
+Brief: Plant Doctor — a one-screen working web app, not a marketing page: the user drops a photo of a sick plant; an AI agent on the Blocks network diagnoses it. The screen shows the photo as the subject with evidence markers pinned to the leaf, streams the agent's progress, then presents the diagnosis with a confidence value, the ranked differential, and a numbered treatment plan. — botanical, clinical calm, editorial, warm daylight, trustworthy — Next.js + Tailwind 4
+Transferred from reference: Dark documentation landing page that pairs a centered, air-heavy typographic hero with a full-bleed live product demo docked below and cropped by the viewport edge.
 
 **This page is a COMPOSITION, not a stack of sections. Build `composition.html`'s geometry, restyled into your framework — the percent coordinates and z-planes below are the design. The overlaps, attachments, and container breaks are intentional; flattening them into a clean vertical stack destroys the design.**
 
 ## The principles this composition embodies
 
-- dominant mass anchors top-left with high-contrast green texture
-- organic irregular boundaries replace rigid grids to mimic cellular structure
-- diagnostic data pins directly onto the leaf anatomy rather than floating panels
-- vertical flow line carries the headline and progress stream down the left edge
-- density fills the entire canvas height with no empty bands
+- switch axis systems mid-screen: a calm three-part verdict band above, an asymmetric rail-plus-exhibit block below
+- crop the primary artifact at the frame edge so the exhibit implies continuation
+- insert a control strip between the verdict band and the exhibit so the photo reads as interactive apparatus, not decoration
+- every quantitative unit runs label → magnitude → interpretation → context so the screen scans as one table
+- freeze an interaction state (agent mid-step) into the still layout to prove liveness
+- near-monochrome surfaces; one saturated marker dot carries hierarchy signalling
 
-Verified in the render: 2/5 principles hold structurally.
+Verified in the render: 2/6 principles hold structurally.
 
 ## Global rules
 
-- Canvas: 1440px design width, ~2722px tall; position elements with percent coordinates inside one `position: relative` canvas so the composition scales.
-- Depth planes: 2. Map plane n to `z-index: n*10`. Elements on different planes are ALLOWED to overlap — that is the point.
+- Canvas: 1440px design width, ~1320px tall; position elements with percent coordinates inside one `position: relative` canvas so the composition scales.
+- Depth planes: 3. Map plane n to `z-index: n*10`. Elements on different planes are ALLOWED to overlap — that is the point.
 - Fonts: display Fraunces, body Inter (theme_css loads them).
 - Colors only via the theme tokens: --design-bg, --design-surface, --design-text, --design-muted, --design-primary, --design-primary-strong.
-- Focal element: `leafSubject` — nothing may out-scale or out-contrast it.
+- Focal element: `leaf-photo` — nothing may out-scale or out-contrast it.
 
 ## Elements, in reading order
 
-### `leafSubject` — primary-subject (image, depth plane 1)
+### `topbar` — app top bar (group, depth plane 3)
 
-- Geometry: left -38.00%, top -25.86%, width 100.00%, height 80.82% (1440x2200px at design size).
-- Imagery: transparent-background cutout (use the shipped PNG as-is, no frame, no border-radius) of "macro closeup of a healthy green leaf with a single subtle brown necrotic spot, cellular texture visible, soft directional lighting casting deep shadows within the veins".
+- Geometry: left 0.00%, top 0.00%, width 100.00%, height 5.00% (1440x66px at design size).
 - Surface: solid.
-- Color role: primary — the token to use.
+- Color role: surface — the token to use.
 
-### `nav-ghost` — navigation (group, depth plane 2)
+### `brand` — product name (text, depth plane 3)
 
-- Geometry: left 0.00%, top 0.00%, width 100.00%, height 2.42% (1440x66px at design size).
-- Items: upload · history · settings
-- Surface: outline.
-- Color role: neutral — the token to use.
+- Geometry: left 2.00%, top 1.10%, width 24.00%, height 2.80% (346x37px at design size).
+- Heading: "Plant Doctor".
 
-### `footer-line` — footer-text (text, depth plane 1)
+### `nav-links` — nav links (text, depth plane 3)
 
-- Geometry: left 0.00%, top 15.36%, width 100.00%, height 1.62% (1440x44px at design size).
-- Body: "© 2024 Plant Doctor AI. Clinical diagnosis guidance."
-- Surface: solid.
-- Color role: neutral — the token to use.
+- Geometry: left 48.00%, top 1.30%, width 50.00%, height 2.40% (720x32px at design size).
+- Items: Scans · Library · Care log · Re-diagnose
 
-### `confidence-pin` — metric-annotation (viz, depth plane 3)
+### `screen-title` — screen title and specimen line (text, depth plane 2)
 
-- Geometry: left 69.18%, top 26.63%, width 14.00%, height 8.08% (202x220px at design size).
-- pinned to the point 88%,50% ON `leafSubject` with a drawn leader line — the annotation belongs to the subject, not to a card row
-- Data viz (show diagnosis confidence percentage): render as leaderCallout — the visual idea: value pinned to the leaf edge with a leader line. The exact SVG is inlined in composition.html; adapt it, never swap it for a generic stat card.
-- Values: Confidence=98.4%.
-- Surface: solid.
-- Color role: neutral — the token to use.
+- Geometry: left 3.00%, top 7.00%, width 29.00%, height 12.00% (418x158px at design size).
+- Heading: "Leaf scan — Ficus lyrata" — sized to FILL the frame (display type is the design; do not shrink it).
+- Metric: IMG_2291 · 14:06 · north window
 
-### `anatomy-pin` — spatial-condition (viz, depth plane 3)
+### `diagnosis` — primary diagnosis verdict (panel, depth plane 2)
 
-- Geometry: left 8.07%, top 42.03%, width 16.00%, height 9.70% (230x264px at design size).
-- pinned to the point 28%,70% ON `leafSubject` with a drawn leader line — the annotation belongs to the subject, not to a card row
-- Data viz (show disease location and tissue damage): render as ringSegment — the visual idea: magnified view pinned to the brown spot. The exact SVG is inlined in composition.html; adapt it, never swap it for a generic stat card.
-- Values: Location=mid-vein.
-- Surface: glass.
-- Color role: primary — the token to use.
-
-### `treatment-plan` — step-by-step-guide (panel, depth plane 2)
-
-- Geometry: left 8.40%, top 47.27%, width 28.00%, height 36.37% (403x990px at design size).
-- pinned to the point 0%,100% ON `progress-stream` with a drawn leader line — the annotation belongs to the subject, not to a card row
-- Items: 1. Remove affected leaf · 2. Apply fungicide spray · 3. Water lightly
-- Surface: solid.
-- Color role: neutral — the token to use.
-
-### `progress-stream` — diagnostic-progress (viz, depth plane 2)
-
-- Geometry: left -6.00%, top 51.64%, width 12.00%, height 46.88% (173x1276px at design size).
-- pinned to the point 2%,100% ON `leafSubject` with a drawn leader line — the annotation belongs to the subject, not to a card row
-- Data viz (show AI agent processing steps): render as flowLine — the visual idea: vertical flowing line with pulsing nodes. The exact SVG is inlined in composition.html; adapt it, never swap it for a generic stat card.
-- Values: Step 1=upload, Step 2=analyzing, Step 3=done.
-- Surface: glass.
-- Color role: accent — the ONE accent carrier on this page.
-
-### `headline-stream` — headline-in-flow (text, depth plane 2)
-
-- Geometry: left -6.00%, top 67.08%, width 12.00%, height 11.32% (173x308px at design size).
-- pinned to the point 0%,100% ON `leafSubject` with a drawn leader line — the annotation belongs to the subject, not to a card row
-- Heading: "Plant Doctor" — sized to FILL the frame (display type is the design; do not shrink it).
-- Body: "drop a photo of a sick plant and an AI agent"
+- Geometry: left 34.00%, top 7.00%, width 34.00%, height 12.00% (490x158px at design size).
+- Heading: "Septoria leaf spot".
+- Body: "Fungal spotting spread by water splashing onto lower leaves."
+- Metric: primary diagnosis
 - Surface: solid.
 - Color role: ink — the token to use.
 
-### `agent-status` — system-health (viz, depth plane 2)
+### `confidence` — certainty instrument (viz, depth plane 3)
 
-- Geometry: left 2.95%, top 70.87%, width 10.00%, height 6.47% (144x176px at design size).
-- pinned to the point 0%,100% ON `progress-stream` with a drawn leader line — the annotation belongs to the subject, not to a card row
-- Data viz (indicate diagnostic agent status): render as ringSegment — the visual idea: status ring. The exact SVG is inlined in composition.html; adapt it, never swap it for a generic stat card.
-- Values: Status=Active.
+- Geometry: left 62.00%, top 7.00%, width 31.00%, height 12.00% (446x158px at design size).
+- overlaps `diagnosis` by 7% from the left — this overlap is the depth cue, keep it
+- Data viz (communicate certainty of the primary diagnosis at a glance): render as ringSegment — the visual idea: open ring with the percentage set large inside it and a context caption beneath. The exact SVG is inlined in composition.html; adapt it, never swap it for a generic stat card.
+- Values: confidence=87%, markers matched=4 of 5.
+- Surface: outline.
+- Color role: accent — the ONE accent carrier on this page.
+
+### `view-tabs` — control strip between verdict band and exhibit (text, depth plane 3)
+
+- Geometry: left 3.00%, top 21.00%, width 94.00%, height 7.00% (1354x92px at design size).
+- Items: Evidence · Overlay mask · Differential · Zoom 1.4× · Compare last scan
+- Surface: outline.
+- Color role: neutral — the token to use.
+
+### `agent-stream` — live agent reasoning rail (viz, depth plane 3)
+
+- Geometry: left 3.00%, top 27.00%, width 34.00%, height 20.00% (490x264px at design size).
+- Data viz (communicate progress of the agent's live analysis run): render as dotField — the visual idea: vertical step list, filled dots for finished steps and one live dot on the running step, elapsed time in the header. The exact SVG is inlined in composition.html; adapt it, never swap it for a generic stat card.
+- Values: segment leaf mask=done, detect lesion clusters=done, measure halo ratio=done, match spore pattern=done, rank differentials=running 12.4s.
 - Surface: solid.
-- Color role: primary — the token to use.
+- Color role: surface — the token to use.
 
-### `severity-badge` — magnitude-indicator (panel, depth plane 2)
+### `leaf-photo` — primary-subject: uploaded leaf photo work area (image, depth plane 2)
 
-- Geometry: left -6.56%, top 73.55%, width 28.00%, height 14.55% (403x396px at design size).
-- pinned to the point 0%,100% ON `progress-stream` with a drawn leader line — the annotation belongs to the subject, not to a card row
-- Heading: "Severity".
-- Metric:  Low
-- Items: Urgency: 2/10
+- Geometry: left 45.44%, top 27.00%, width 62.00%, height 45.00% (893x594px at design size).
+- breaks its container's right edge by 12% of its own size — let it clip out, do not shrink it to fit
+- Imagery: contained image of "macro photograph of one fiddle-leaf fig leaf with dark brown necrotic spots ringed by yellow halos, clinical flat lighting, neutral grey backdrop".
+- Metric: 4032×3024 · overlay on
+
+### `marker-a` — evidence marker pinned to lesion (viz, depth plane 3)
+
+- Geometry: left 43.00%, top 32.00%, width 17.00%, height 7.00% (245x92px at design size).
+- pinned to the point 24%,34% ON `leaf-photo` with a drawn leader line — the annotation belongs to the subject, not to a card row
+- overlaps `leaf-photo` by 85% from the left — this overlap is the depth cue, keep it
+- Data viz (locate symptoms directly on the plant photo): render as leaderCallout — the visual idea: saturated dot on the lesion with a leader line to a compact readout. The exact SVG is inlined in composition.html; adapt it, never swap it for a generic stat card.
+- Values: necrotic center=4mm.
+- Surface: glass.
+- Color role: accent — the ONE accent carrier on this page.
+
+### `differential` — ranked competing conditions (viz, depth plane 3)
+
+- Geometry: left 3.00%, top 49.00%, width 34.00%, height 23.00% (490x304px at design size).
+- Data viz (compare magnitudes — rank competing explanations against each other): render as barColumn — the visual idea: ranked rows, each a label with a hairline likelihood bar and the score at the row end. The exact SVG is inlined in composition.html; adapt it, never swap it for a generic stat card.
+- Values: Septoria leaf spot=87, Bacterial leaf spot=41, Overwatering edema=23, Spider mite damage=11.
+- Surface: solid.
+- Color role: surface — the token to use.
+
+### `marker-b` — evidence marker pinned to leaf margin (viz, depth plane 3)
+
+- Geometry: left 80.00%, top 57.00%, width 18.00%, height 7.00% (259x92px at design size).
+- pinned to the point 62%,74% ON `leaf-photo` with a drawn leader line — the annotation belongs to the subject, not to a card row
+- overlaps `leaf-photo` by 80% from the right — this overlap is the depth cue, keep it
+- Data viz (locate symptoms directly on the plant photo): render as leaderCallout — the visual idea: dot on the chlorotic margin with a leader line to a compact readout. The exact SVG is inlined in composition.html; adapt it, never swap it for a generic stat card.
+- Values: chlorotic halo=9 sites.
+- Surface: glass.
+- Color role: accent — the ONE accent carrier on this page.
+
+### `treatment` — numbered treatment plan (panel, depth plane 3)
+
+- Geometry: left 3.00%, top 74.00%, width 95.00%, height 18.00% (1368x238px at design size).
+- Heading: "Do this next".
+- Metric: treatment plan · 14 days
+- Items: 1 · Remove spotted leaves today — sterile shears, bin, do not compost · 2 · Water at soil only, morning — no misting for 14 days · 3 · Copper fungicide spray day 2 and day 9 — 5ml per litre · 4 · Move 40cm from the window, run a small fan 4h daily · 5 · Re-scan day 10 to compare lesion count
 - Surface: solid.
 - Color role: neutral — the token to use.
+
+### `provenance` — provenance line (text, depth plane 1)
+
+- Geometry: left 3.00%, top 96.00%, width 70.00%, height 3.00% (1008x40px at design size).
+- Body: "agent pd-4 on Blocks network · model run 12.4s · re-diagnose"
 
 ## Responsive contract
 

@@ -1,6 +1,18 @@
-import type { MessageSpec } from "@/components/MessagePanel";
 import type { Refusal } from "./diagnosis";
 import type { FailureKind } from "./protocol";
+
+export type MessageTone = "neutral" | "amber" | "coral";
+
+/** A refusal, a queue notice or a failure, as the verdict panel shows it. */
+export interface MessageSpec {
+  tone: MessageTone;
+  title: string;
+  body: string;
+  /** Re-shoot advice, shown in the rail's lower panel. */
+  list: string[];
+  primary: string;
+  secondary: string;
+}
 
 /** Keeps the model's own words in the copy without letting them run away. */
 function quote(text: string, limit = 260): string {
@@ -9,15 +21,14 @@ function quote(text: string, limit = 260): string {
 }
 
 /**
- * A timeout is deliberately absent: it keeps the progress panel, with the
- * second step marked failed, rather than replacing it with a message.
+ * A timeout is deliberately absent: it keeps the agent stream, with the
+ * last step marked failed, rather than replacing it with a message.
  */
 export const FAILURE_MESSAGES: Record<
   Exclude<FailureKind, "timeout">,
   MessageSpec
 > = {
   offline: {
-    glyph: "z",
     tone: "neutral",
     title: "The service is asleep",
     body: "The model server is switched off between sessions to keep costs down. This is normal — waking it takes a moment.",
@@ -26,7 +37,6 @@ export const FAILURE_MESSAGES: Record<
     secondary: "Start over",
   },
   network: {
-    glyph: "!",
     tone: "coral",
     title: "The connection dropped",
     body: "The request was cut off partway through. Your photo is still loaded here, so retrying does not re-upload it.",
@@ -35,7 +45,6 @@ export const FAILURE_MESSAGES: Record<
     secondary: "Start over",
   },
   generic: {
-    glyph: "!",
     tone: "coral",
     title: "That request failed",
     body: "Something went wrong between here and the model. No details came back that would help you, so the useful move is to send the same photo again.",
@@ -46,7 +55,6 @@ export const FAILURE_MESSAGES: Record<
 };
 
 export const QUEUED_MESSAGE: MessageSpec = {
-  glyph: "•",
   tone: "amber",
   title: "The model is busy",
   body: "It handles one photo at a time and is finishing another request. Your photo is queued and will run next — nothing is lost.",
@@ -69,7 +77,6 @@ const NOT_DIAGNOSABLE_TIPS = [
 
 export function noPlantMessage(refusal: Refusal): MessageSpec {
   return {
-    glyph: "?",
     tone: "neutral",
     title: "No plant in this photo",
     body: quote(refusal.body),
@@ -81,7 +88,6 @@ export function noPlantMessage(refusal: Refusal): MessageSpec {
 
 export function notDiagnosableMessage(refusal: Refusal): MessageSpec {
   return {
-    glyph: "!",
     tone: "amber",
     title: "This photo cannot be read",
     body: quote(refusal.body),
@@ -93,7 +99,6 @@ export function notDiagnosableMessage(refusal: Refusal): MessageSpec {
 
 export function unreadableMessage(reply: string): MessageSpec {
   return {
-    glyph: "!",
     tone: "coral",
     title: "That photo did not make it through",
     body: `The agent received the request but could not open the image: “${quote(reply)}”`,
