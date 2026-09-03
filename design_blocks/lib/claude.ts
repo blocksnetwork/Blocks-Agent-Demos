@@ -98,6 +98,33 @@ function strictSchema(schema: unknown): unknown {
   return out;
 }
 
+/**
+ * Structured outputs also cap the number of optional properties (the API
+ * refuses a schema past ~24 with "too many optional parameters"). Such
+ * schemas go straight to text mode instead of paying for a rejected
+ * request on every direction.
+ */
+const MAX_OPTIONAL = 24;
+const JSON_ONLY = 'Reply with the JSON object only — no prose, no markdown fences, no commentary before or after it.';
+
+function optionalCount(schema: unknown): number {
+  if (Array.isArray(schema)) return schema.reduce((n, s) => n + optionalCount(s), 0);
+  if (!schema || typeof schema !== 'object') return 0;
+  const node = schema as Record<string, unknown>;
+  let count = 0;
+  if (node.properties && typeof node.properties === 'object') {
+    const required = new Set(Array.isArray(node.required) ? (node.required as string[]) : []);
+    for (const [name, sub] of Object.entries(node.properties as Record<string, unknown>)) {
+      if (!required.has(name)) count++;
+      count += optionalCount(sub);
+    }
+  }
+  for (const [key, value] of Object.entries(node)) {
+    if (key !== 'properties' && key !== 'required') count += optionalCount(value);
+  }
+  return count;
+}
+
 export type ClaudeOpts = {
   schema?: object;
   timeoutMs?: number;
@@ -121,15 +148,19 @@ export async function claudeChat(messages: unknown[], maxTokens: number, opts: C
   // Callers size max_tokens for the 4B model; thinking shares the budget
   // here and a composition spec alone runs past 8k characters, so give
   // the hosted model real headroom.
-  const budget = Math.max(8192, maxTokens * 4);
-  const useSchema = Boolean(opts.schema) && !rejectedSchemas.has(opts.schema!);
+  const budget = Math.max(16_384, maxTokens * 6);
+  const useSchema = Boolean(opts.schema) && !rejectedSchemas.has(opts.schema!) && optionalCount(opts.schema!) <= MAX_OPTIONAL;
+  // Without a grammar the model must be told to skip the prose, or a
+  // composition spec arrives wrapped in a page of explanation.
+  const systemFor = (withSchema: boolean) =>
+    [system, opts.schema && !withSchema ? JSON_ONLY : ''].filter(Boolean).join('\n\n');
 
   const run = (withSchema: boolean) =>
     client!.messages.create(
       {
         model: MODEL,
         max_tokens: budget,
-        ...(system ? { system } : {}),
+        ...(systemFor(withSchema) ? { system: systemFor(withSchema) } : {}),
         messages: turns,
         ...(withSchema && opts.schema
           ? { output_config: { format: { type: 'json_schema' as const, schema: strictSchema(opts.schema) as Record<string, unknown> } } }

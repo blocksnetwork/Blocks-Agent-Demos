@@ -844,6 +844,11 @@ export type GeneratedComposition = {
   attempts: number;
 };
 
+/** What the brief describes; set by the curation pass, steers density and furniture. */
+export type PageType = 'app-screen' | 'dashboard' | 'landing' | 'editorial';
+
+export type ContentSeed = { headline?: string; pageType?: PageType; pageGuidance?: string };
+
 const STANCE_NOTES: Record<Stance, string> = {
   faithful: 'Embody the structural brief as closely as the product allows.',
   bolder: 'Amplify the signature moves: stronger overlaps, bigger dominant mass, deeper layering than the brief states.',
@@ -855,7 +860,7 @@ function specPrompt(
   intent: ProductIntent,
   analysis: DesignReferenceAnalysis,
   stance: Stance,
-  contentSeed: { headline?: string },
+  contentSeed: ContentSeed,
 ): Array<{ role: string; content: string }> {
   const dataLines = intent.dataDisplays
     .map((d) => `- ${d.intent} (${d.entities.join(', ') || 'unspecified'})`)
@@ -879,7 +884,7 @@ function specPrompt(
         '"content":{"heading","body","label","value","items":[],"fit":"fill|wrap"},' +
         '"style":{"surface":"solid|glass|outline|none","paletteRole":"accent|primary|ink|neutral|surface","emphasis":<0-1>},' +
         '"layout":{"type":"grid","cols":<1-6>,"gap":<0-6>} (groups only; children without frames auto-flow)}]}\n' +
-        'Rules: 9-14 elements, terse content strings, canvas height 1400-2600 for a landing page. FILL the canvas — no empty band taller than ~15% of the page; the first viewport must feel dense with designed elements. Include a slim navigation group (explicit text children) and a footer text line as content, plus realistic content (headings, labels, values) from the product domain. ' +
+        'Rules: 9-14 elements, terse content strings, canvas height per the PAGE TYPE (landing 1400-2600; app screen or dashboard 1200-1400, one viewport). FILL the canvas — no empty band taller than ~12% of the page; the first viewport must feel dense with designed elements (at least 60% covered). Include a slim navigation or top-bar group (explicit text children) and, for landing or editorial pages, a footer text line, plus realistic content (headings, labels, values) from the product domain. ' +
         'Every product data need gets a viz element whose render primitives you choose to match the reference\'s data-display FORM. ' +
         'attachedTo pins annotations to points on a subject; encircles wraps a ring around it; overlaps and z create real depth; breaksContainer and frame overshoot create bleeds. ' +
         'A navigation area, if the page needs one, is a group of explicit text children — there is no prefab nav.\n\n' +
@@ -899,6 +904,7 @@ function specPrompt(
         `Data needs:\n${dataLines || '- none'}\n` +
         `Primary visual subject: ${intent.primarySubject ?? 'none — let typography and surfaces carry the design'}\n` +
         (contentSeed.headline ? `Working headline: ${contentSeed.headline}\n` : '') +
+        (contentSeed.pageGuidance ? `\nPAGE TYPE: ${contentSeed.pageType ?? 'page'}\n${contentSeed.pageGuidance}\n` : '') +
         `\nREFERENCE (domain-scrubbed structural brief)\n${transferBrief(analysis)}\n` +
         `\nSTANCE: ${stance} — ${STANCE_NOTES[stance]}`,
     },
@@ -914,7 +920,7 @@ export async function generateComposition(
   intent: ProductIntent,
   analysis: DesignReferenceAnalysis,
   stance: Stance,
-  contentSeed: { headline?: string } = {},
+  contentSeed: ContentSeed = {},
 ): Promise<GeneratedComposition | null> {
   const messages = specPrompt(intent, analysis, stance, contentSeed);
   const guidedSchema = buildGuidedSchema(analysis);

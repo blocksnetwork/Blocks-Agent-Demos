@@ -12,6 +12,7 @@ import { renderStickers } from './lib/stickers.js';
 import { generateHero } from './lib/imagine.js';
 import { proceduralHeroPng, renderContactSheet, renderOgImage, renderTile } from './lib/comps.js';
 import { pickHeroReference, referenceHeroPng, type HeroSource } from './lib/hero.js';
+import { curateReferences, pageGuidance, type Curation } from './lib/curate.js';
 import { assessQuality, type QualityReport } from './lib/quality.js';
 import { buildThemeCss } from './lib/tokens.js';
 import { gatherAssets } from './lib/assets.js';
@@ -56,7 +57,9 @@ import { specBlueprint, emitCompositionHtml } from './lib/blueprint.js';
  */
 
 const BANK_DIR = process.env.BANK_DIR ?? './bank';
-const TASK_BUDGET_MS = Number(process.env.DESIGN_TASK_BUDGET_MS ?? 380_000);
+// Hosted authoring runs three sequential transfers plus a critique round;
+// 380s shed the third direction every run, 450s fits all of them.
+const TASK_BUDGET_MS = Number(process.env.DESIGN_TASK_BUDGET_MS ?? 450_000);
 const CRITIQUE_ROUNDS = Math.max(0, Math.min(2, Number(process.env.DESIGN_CRITIQUE_ROUNDS ?? 1)));
 // P4 gate: craft proxies MEASURE from day one, but cannot judge until the
 // W2-4 calibration report recommends a weight — default 0, hard-clamped.
@@ -248,15 +251,21 @@ export default async function handler(
   const startedAt = Date.now();
   const remaining = () => TASK_BUDGET_MS - (Date.now() - startedAt);
   const sheds: string[] = [];
+  // Every stage goes to the task stream AND the service log, so "what is
+  // it doing right now" has an answer on the box, not just in the client.
+  const status = (message: string) => {
+    console.error(`[design-blocks] ${Math.round((Date.now() - startedAt) / 1000)}s ${message}`);
+    ctx?.reportStatus(message);
+  };
 
-  ctx?.reportStatus('Reading the brief...');
+  status('Reading the brief...');
   const brief = parseBrief(await readBrief(task, ctx));
   const briefText = [brief.goal, brief.vibe, brief.framework].filter(Boolean).join(' — ');
   const fallbackHeadline = (brief.goal || briefText || 'Your next thing').split(/[.!?]/)[0].slice(0, 60);
 
   /* 1 — retrieve. */
   const bank = await loadBank(BANK_DIR);
-  ctx?.reportStatus(
+  status(
     bank.entries.length
       ? `Searching ${bank.entries.length} references...`
       : 'Bank is empty — designing from the brief alone...',
@@ -268,11 +277,28 @@ export default async function handler(
   // plants must not have its layout "transferred" from a moss macro just
   // because CLIP ranked the moss first.
   const uiBank = { ...bank, entries: bank.entries.filter((e) => e.kind === 'ui') };
-  const uiRefs = uiBank.entries.length ? search(uiBank, query, briefText, 8).map((hit) => hit.entry) : [];
-  const anchors = await pickTransferAnchors(uiRefs.length ? uiRefs : topRefs, BANK_DIR);
+  const uiRefs = uiBank.entries.length ? search(uiBank, query, briefText, 14).map((hit) => hit.entry) : [];
+  const photoBank = { ...bank, entries: bank.entries.filter((e) => e.kind !== 'ui') };
+  const photoRefs = photoBank.entries.length ? search(photoBank, query, briefText, 20).map((hit) => hit.entry) : [];
+  // An art-director pass over the candidates: a vision model reads the
+  // brief and LOOKS at the page designs and photographs, then names the
+  // page type, the three anchors and the hero photograph. CLIP ranking
+  // alone put a monospace blog under an app brief and a grey texture
+  // under a plant product.
+  status('Curating references — reviewing the page designs and photographs against the brief...');
+  const heuristicAnchors = await pickTransferAnchors(uiRefs.length ? uiRefs : topRefs, BANK_DIR);
+  const curation: Curation | null = await curateReferences(briefText, uiRefs, photoRefs, BANK_DIR);
+  const anchors = curation ? curation.anchors.map((a, i) => a ?? heuristicAnchors[i]) : heuristicAnchors;
+  if (curation) {
+    status(
+      `Page type: ${curation.pageType}. Anchors ${anchors.map((a) => a?.id ?? '—').join(', ')}; hero ${curation.hero?.id ?? 'none'} — ${curation.reasons.faithful ?? ''}`,
+    );
+  } else {
+    sheds.push('reference curation unavailable — anchors chosen by CLIP ranking');
+  }
 
   /* 2 — product intent and style directions, concurrently. */
-  ctx?.reportStatus('Understanding the product and sketching three directions...');
+  status('Understanding the product and sketching three directions...');
   const [intent, specs] = await Promise.all([
     deriveIntent(briefText || 'modern product page'),
     draftDirections(
@@ -297,11 +323,11 @@ export default async function handler(
   const usableCount = analyses.filter((a) => analysisUsable(a)).length;
   if (usableCount > 0) {
     const patternTotal = analyses.reduce((n, a) => n + (a?.signaturePatterns.length ?? 0), 0);
-    ctx?.reportStatus(
+    status(
       `Analyzed ${usableCount} reference composition${usableCount > 1 ? 's' : ''} — ${patternTotal} distinctive design patterns extracted.`,
     );
   } else {
-    ctx?.reportStatus('No reference decomposition available — building from the template fallback...');
+    status('No reference decomposition available — building from the template fallback...');
   }
 
   /* 4 — composition transfer, SEQUENTIAL by design: a shared T4 divides
@@ -315,8 +341,12 @@ export default async function handler(
       sheds.push(`direction ${stances[index]} fell back to template (deadline)`);
       return null;
     }
-    ctx?.reportStatus(`Transferring reference structure (${stances[index]})...`);
-    return generateComposition(intent, analysis, stances[index], { headline: fallbackHeadline });
+    status(`Transferring reference structure (${stances[index]})...`);
+    return generateComposition(intent, analysis, stances[index], {
+      headline: fallbackHeadline,
+      pageType: curation?.pageType,
+      pageGuidance: curation ? pageGuidance(curation.pageType) : undefined,
+    });
   };
   const compositions: Array<GeneratedComposition | null> = [];
   for (let i = 0; i < stances.length; i++) compositions.push(await generateFor(i));
@@ -368,7 +398,7 @@ export default async function handler(
   // VRAM for it, and its output lost to the photos anyway).
   for (let i = 0; i < outcomes.length; i++) {
     const outcome = outcomes[i];
-    ctx?.reportStatus(`Art-directing imagery ${i + 1}/${outcomes.length} — ${outcome.spec.name}...`);
+    status(`Art-directing imagery ${i + 1}/${outcomes.length} — ${outcome.spec.name}...`);
     if (IMAGINE_ENABLED && remaining() > 100_000) {
       const imageryElements = outcome.composition?.spec.elements.filter((e) => e.imagery) ?? [];
       const primary = imageryElements.sort((a, b) => b.frame.w * b.frame.h - a.frame.w * a.frame.h)[0];
@@ -383,8 +413,14 @@ export default async function handler(
         continue;
       }
     }
-    const ref = pickHeroReference(topRefs, i);
-    if (!ref) continue;
+    // The curator saw every photograph next to the brief; its pick (or its
+    // "none") outranks the CLIP nearest-neighbour, which is how a grey
+    // texture ended up as the hero of a plant product.
+    const ref = curation ? (curation.hero ?? undefined) : pickHeroReference(topRefs, i);
+    if (!ref) {
+      if (curation) outcome.sheds.push('no bank photograph shows the product subject — procedural hero');
+      continue;
+    }
     const photo = await referenceHeroPng(BANK_DIR, ref, outcome.spec.palette);
     if (photo) {
       outcome.heroPng = photo;
@@ -395,7 +431,7 @@ export default async function handler(
     }
   }
 
-  ctx?.reportStatus('Rendering compositions...');
+  status('Rendering compositions...');
   const tileJobs = outcomes.map(async (outcome) => {
     if (outcome.composition && outcome.layout) {
       const assets: SceneAssets = new Map();
@@ -440,7 +476,7 @@ export default async function handler(
 
   /* 6 — deterministic scoring: structure leads, CLIP measures fit to the
      BRIEF (not the anchor — cloning the reference must not win). */
-  ctx?.reportStatus('Scoring structural fidelity against each reference decomposition...');
+  status('Scoring structural fidelity against each reference decomposition...');
   const briefEmbedding = query ?? (await embedText(briefText || 'clean modern web app'));
   await Promise.all(
     outcomes.map(async (outcome) => {
@@ -470,7 +506,7 @@ export default async function handler(
 
   const ranked = [...outcomes].sort((a, b) => b.score - a.score);
   const winner = ranked[0];
-  ctx?.reportStatus(`Winner: ${winner.spec.name} (${winner.stance}, ${winner.compositionSource}) — refining...`);
+  status(`Winner: ${winner.spec.name} (${winner.stance}, ${winner.compositionSource}) — refining...`);
 
   /* 7 — cutouts for the winner, then the bounded critique loop. */
   const critiqueLog: Array<{ round: number; issues: string[]; discarded: string[]; applied: number; kept: boolean }> = [];
@@ -508,7 +544,7 @@ export default async function handler(
         sheds.push(`critique round ${round} skipped (deadline)`);
         break;
       }
-      ctx?.reportStatus(`Critiquing composition (round ${round}) — checking depth, overlap, and hierarchy...`);
+      status(`Critiquing composition (round ${round}) — checking depth, overlap, and hierarchy...`);
       const annotated = await renderScene(
         winner.composition.spec,
         winner.layout,
@@ -549,13 +585,13 @@ export default async function handler(
         winner.structural = revisedStructural;
         winner.quality = revisedQuality;
         winner.preview = (await rerender()) ?? winner.preview;
-        ctx?.reportStatus(
+        status(
           critique.topIssues[0]
             ? `Revised: ${critique.topIssues[0].slice(0, 90)}`
             : 'Applied structural revisions.',
         );
       } else {
-        ctx?.reportStatus('Revision would have weakened the structure — kept the original.');
+        status('Revision would have weakened the structure — kept the original.');
       }
       critiqueLog.push({
         round,
@@ -637,6 +673,14 @@ export default async function handler(
     referenceId: winner.anchor?.id ?? null,
     referenceKind: winner.anchor?.kind ?? null,
     anchorPool: uiRefs.length ? 'page-designs' : 'all-references',
+    curation: curation
+      ? {
+          pageType: curation.pageType,
+          anchorIds: curation.anchors.map((a) => a?.id ?? null),
+          heroId: curation.hero?.id ?? null,
+          reasons: curation.reasons,
+        }
+      : null,
     referenceSummary: winner.analysis?.summary ?? null,
     signaturePatternsUsed: winnerSpec?.source.signaturePatternsUsed ?? [],
     principles: winnerSpec?.principles ?? [],
@@ -754,7 +798,7 @@ export default async function handler(
       `transfers ${outcomes.filter((o) => o.compositionSource === 'reference-transfer').length}/3, ` +
       `critique rounds ${critiqueLog.length}, elapsed ${Math.round((Date.now() - startedAt) / 1000)}s`,
   );
-  ctx?.reportStatus(
+  status(
     `Done: ${winner.spec.name} wins (${winner.compositionSource}) — comps, spec, blueprint, theme, and imagery attached.`,
   );
 

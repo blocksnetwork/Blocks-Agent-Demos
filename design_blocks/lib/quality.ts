@@ -162,8 +162,8 @@ export function assessQuality(spec: CompositionSpec, layout: ResolvedLayout): Qu
   };
   const coverageWhole = coverage(0, canvas.h);
   const coverageViewport = coverage(0, Math.min(canvas.h, VIEWPORT_H));
-  if (coverageViewport < 0.45) failures.push(`the first viewport is ${Math.round(coverageViewport * 100)}% covered — the opening screen reads as empty`);
-  if (coverageWhole < 0.5) failures.push(`the page is ${Math.round(coverageWhole * 100)}% covered — dead space dominates`);
+  if (coverageViewport < 0.55) failures.push(`the first viewport is ${Math.round(coverageViewport * 100)}% covered — the opening screen reads as empty`);
+  if (coverageWhole < 0.55) failures.push(`the page is ${Math.round(coverageWhole * 100)}% covered — dead space dominates`);
 
   const bandH = canvas.h * 0.12;
   for (let y = canvas.h * 0.05; y + bandH <= canvas.h * 0.92; y += canvas.h * 0.025) {
