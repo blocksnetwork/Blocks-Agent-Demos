@@ -67,6 +67,37 @@ function plainText(content: string | LoosePart[] | undefined): string {
   return (content ?? []).map((p) => p.text ?? '').filter(Boolean).join('\n');
 }
 
+/**
+ * Structured outputs accept a subset of JSON Schema: no numeric ranges,
+ * length or item-count bounds, and every object must say
+ * `additionalProperties: false`. vLLM's guided_json schemas use all of
+ * those, so rebuild each schema with only the supported keywords — the
+ * prompt still states the bounds and the caller's validator enforces them.
+ */
+const SCHEMA_KEYWORDS = new Set([
+  'type', 'properties', 'required', 'items', 'enum', 'const', 'description', 'title',
+  'additionalProperties', 'anyOf', 'oneOf', 'allOf', '$ref', '$defs', 'definitions',
+]);
+
+function strictSchema(schema: unknown): unknown {
+  if (Array.isArray(schema)) return schema.map(strictSchema);
+  if (!schema || typeof schema !== 'object') return schema;
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(schema as Record<string, unknown>)) {
+    if (!SCHEMA_KEYWORDS.has(key)) continue;
+    // properties/$defs are maps of schemas — recurse into values, keep keys
+    if (key === 'properties' || key === '$defs' || key === 'definitions') {
+      const map: Record<string, unknown> = {};
+      for (const [name, sub] of Object.entries((value ?? {}) as Record<string, unknown>)) map[name] = strictSchema(sub);
+      out[key] = map;
+    } else {
+      out[key] = strictSchema(value);
+    }
+  }
+  if (out.type === 'object' || out.properties) out.additionalProperties = false;
+  return out;
+}
+
 export type ClaudeOpts = {
   schema?: object;
   timeoutMs?: number;
@@ -88,8 +119,9 @@ export async function claudeChat(messages: unknown[], maxTokens: number, opts: C
   if (turns.length === 0 || turns[0].role !== 'user') turns.unshift({ role: 'user', content: 'Begin.' });
 
   // Callers size max_tokens for the 4B model; thinking shares the budget
-  // here, so give the hosted model real headroom.
-  const budget = Math.max(4096, maxTokens * 2);
+  // here and a composition spec alone runs past 8k characters, so give
+  // the hosted model real headroom.
+  const budget = Math.max(8192, maxTokens * 4);
   const useSchema = Boolean(opts.schema) && !rejectedSchemas.has(opts.schema!);
 
   const run = (withSchema: boolean) =>
@@ -100,7 +132,7 @@ export async function claudeChat(messages: unknown[], maxTokens: number, opts: C
         ...(system ? { system } : {}),
         messages: turns,
         ...(withSchema && opts.schema
-          ? { output_config: { format: { type: 'json_schema' as const, schema: opts.schema as Record<string, unknown> } } }
+          ? { output_config: { format: { type: 'json_schema' as const, schema: strictSchema(opts.schema) as Record<string, unknown> } } }
           : {}),
       },
       { timeout: opts.timeoutMs ?? 180_000 },
