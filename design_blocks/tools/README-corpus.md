@@ -1,30 +1,40 @@
-# W2-1 render corpus + blind picker
+# Render corpus + blind picker
 
-Builds a corpus of the system's own renders and lets the owner blind-rank
-~200 pairs in a browser. The picks (`corpus/picks.jsonl`) are the training
-signal for the W2-3 VL judge calibration and the W2-4 preference head.
+Builds a corpus of the design agent's own renders and lets a human blind-rank
+pairs of them in a browser. The picks (`corpus/picks.jsonl`) are the training
+signal for calibrating the vision-model judge and the preference head — the
+data that decides whether `DESIGN_CRAFT_WEIGHT` ever leaves zero.
+
+Everything under `corpus/` and `corpus-box/` is gitignored: renders, pairs,
+and picks stay local.
 
 ## The full flow
 
-1. **Get the tools onto the box.** `design_blocks/` has never been in git —
-   it is untracked on the Mac AND in the box checkout (it originally moved
-   by scp), so `git pull` cannot deliver anything here. Copy exactly the
-   standalone tool files and nothing else:
+The commands below use two placeholders — set them for your own deployment:
+
+```sh
+export BOX=ec2-user@<your-box-hostname>     # the machine running design_blocks
+export KEY=~/.ssh/<your-key>.pem            # its SSH key
+```
+
+1. **Get the tools onto the box.** They ship with the repo, so `git pull`
+   on the box is enough. If the box checkout must stay pinned, copy only
+   the standalone tool files — never `handler.ts` or `lib/`, which the
+   running service depends on:
 
    ```sh
-   scp -i ~/blocks.ai.pem tools/guard.ts tools/corpus-run.ts tools/corpus-briefs.json tools/start-corpus.sh \
-     ec2-user@44.239.142.53:Blocks-Agent-Demos/design_blocks/tools/
+   scp -i "$KEY" tools/guard.ts tools/corpus-run.ts tools/corpus-briefs.json tools/start-corpus.sh \
+     "$BOX":Blocks-Agent-Demos/design_blocks/tools/
    ```
 
-   NEVER touch the box's handler.ts or lib/ — the box copy is the only
-   pristine v3 baseline in existence (preserving/tracking it is W2-6
-   scope) — and NEVER run `deploy/deploy.sh`, which restarts
+   Do not run `deploy/deploy.sh` for this — it restarts
    `design-blocks.service`.
-2. **Generate on the box** (renders need the resident vLLM :8000 + embed
-   :8798; the lib defaults already point at them, no env needed):
+2. **Generate on the box** (renders need the resident vLLM on `:8000` and
+   the embed sidecar on `:8798`; the lib defaults already point at them, so
+   no env is needed):
 
    ```sh
-   ssh -i ~/blocks.ai.pem ec2-user@44.239.142.53 'sh ~/Blocks-Agent-Demos/design_blocks/tools/start-corpus.sh'
+   ssh -i "$KEY" "$BOX" 'sh ~/Blocks-Agent-Demos/design_blocks/tools/start-corpus.sh'
    # then: tail -f ~/design-corpus/run.log on the box
    ```
 
@@ -33,23 +43,23 @@ signal for the W2-3 VL judge calibration and the W2-4 preference head.
    and waits while a live task looks in-flight (10 × 60 s, then exit 3).
    Output goes OUTSIDE the checkout (`~/design-corpus`), so the repo stays
    clean. Run it attended (nohup + tail the log).
-3. **Pull the corpus to the Mac:**
+3. **Pull the corpus to your machine:**
 
    ```sh
-   scp -i ~/blocks.ai.pem -r ec2-user@44.239.142.53:design-corpus ./corpus-box
+   scp -i "$KEY" -r "$BOX":design-corpus ./corpus-box
    ```
 
 4. **Merge box renders + local harvest into `./corpus`:** copy
-   `corpus-box/renders/*` into `corpus/renders/`, then harvest the v3-era
-   renders that only exist on the Mac (test/out is gitignored):
+   `corpus-box/renders/*` into `corpus/renders/`, then harvest any renders
+   that only exist locally (`test/out` is gitignored):
 
    ```sh
-   npx tsx tools/corpus-run.ts --harvest test/out/e2e-box test/out/e2e-box-v3 test/out --out ./corpus
+   npx tsx tools/corpus-run.ts --harvest test/out --out ./corpus
    ```
 
    Harvest is idempotent — a render whose sha1-12 is already in the corpus
    is skipped.
-5. **Sample pairs and rank (Mac only — the picker never runs on the box):**
+5. **Sample pairs and rank (locally — the picker never runs on the box):**
 
    ```sh
    npx tsx tools/make-pairs.ts --corpus ./corpus --n 200

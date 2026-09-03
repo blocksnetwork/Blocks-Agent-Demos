@@ -3,9 +3,10 @@
 A design studio that coding agents consult **before** writing UI code —
 built around deliverables the AI in the editor *cannot produce itself*.
 Claude Code or Cursor sends a one-line brief over the
-[Blocks](https://blocks.ai) network and gets back **three rendered design
+[Blocks](https://blocks.ai/?utm_source=github&utm_medium=organic_social&utm_campaign=huggingface_agents&utm_content=demos) network and gets back **three rendered design
 comps**: real typography, competing palettes, and credited bank
-photography as hero imagery, laid out as 1200×1500 style tiles. The comps are scored against a
+photography as hero imagery, rendered as full-page compositions transferred
+from real reference designs. The comps are scored against a
 curated reference bank (CLIP image-image — the agent *looks* at its own
 options before picking), the winner is ringed on a contact sheet, and it
 comes expanded into a WCAG-solved `theme.css`, a design kit, a 1024px
@@ -92,6 +93,15 @@ npx tsx test/transfer-demo.ts   # two fixture references -> two structurally
                                 # the validator rejecting a template spec
 ```
 
+The offline test suite runs the same way — no models, no sidecars, no
+network — and is what CI runs:
+
+```bash
+npm run typecheck
+npm test        # quality gate, craft proxies, grammar floors
+npm run smoke   # the handler on its worst path: empty bank, every sidecar down
+```
+
 Artifacts per task: `direction` (markdown), `blueprint` (the composition
 walk), `composition_spec` (spec + resolved geometry), `composition_html`
 (the same geometry as positioned HTML/CSS), `analysis` (the reference
@@ -146,6 +156,15 @@ npx tsx ingest/ingest.ts ~/my-inspiration-folder
 # Option B: zero-effort licensed seed from Pexels (free key)
 PEXELS_API_KEY=... npx tsx ingest/seed-pexels.ts
 npx tsx ingest/ingest.ts ./inspo
+
+# Option C: keyless seed from Openverse (CC0 / CC-BY imagery)
+npx tsx ingest/seed-openverse.ts "botanical green leaves" "pastel gradient"
+npx tsx ingest/ingest.ts ./inspo
+
+# Option D: real page designs — screenshots of permissively licensed
+# templates (shadcn/ui, Tabler, HTML5 UP...), credited per shot
+bash tools/shoot-refs.sh ./inspo-ui
+npx tsx ingest/ingest.ts ./inspo-ui --kind ui
 ```
 
 Ingest gives every image a CLIP embedding and a palette (sidecar), a
@@ -216,7 +235,7 @@ icons, and builds to the direction. Reload — designed, not just styled.
 Open the same repo in Cursor and the same agent name answers there too.
 
 If you're pitching the network: `blocks publish` puts the agent in the
-[public catalog](https://app.blocks.ai/agents) with per-task pricing (85/15
+[public catalog](https://app.blocks.ai/agents?utm_source=github&utm_medium=organic_social&utm_campaign=huggingface_agents&utm_content=demos) with per-task pricing (85/15
 split) — every vibe coder's session becomes a customer of your bank.
 
 ## Inputs and outputs
@@ -224,10 +243,23 @@ split) — every vibe coder's session becomes a customer of your bank.
 | | id | Type | Notes |
 |---|---|---|---|
 | in | `brief` | text/plain | JSON `{goal, vibe, framework, count}` or a plain sentence; `count` = refs returned (2-8, default 4) |
-| out | `direction` | text/markdown | guaranteed — the direction + apply-in-order steps |
-| out | `kit` | application/json | guaranteed — palette, tokens, icons, fonts, imagery, refs |
+| out | `direction` | text/markdown | guaranteed — which comp won, why, provenance, and the apply-in-order steps |
+| out | `kit` | application/json | guaranteed — provenance, winner tokens, all three directions with score parts, icons, fonts, photo, refs |
+| out | `blueprint` | text/markdown | guaranteed — the build plan for the winning composition, element by element |
 | out | `theme_css` | text/css | guaranteed — append-safe, WCAG-solved |
-| out | `board` | image/jpeg | the moodboard contact sheet (absent if the bank is empty) |
+| out | `motion_css`, `motion_js` | text/css, text/javascript | guaranteed — the micro-animation kit, wired by data-attributes |
+| out | `hero` | image/png | guaranteed — 1024px hero, bank photograph gradient-mapped to the palette (credit in `kit.winner.heroCredit`) |
+| out | `comp_1`, `comp_2`, `comp_3` | image/png | the three full-page composition previews |
+| out | `comps` | image/png | the contact sheet with scores, winner ringed |
+| out | `og` | image/png | 1200×630 og:image, hero under a scrim with the headline |
+| out | `stickers` | application/json | floating component SVGs in the winner's fonts and palette |
+| out | `composition_spec` | application/json | the winning spec plus resolved pixel geometry |
+| out | `composition_html` | text/html | the same geometry as standalone positioned HTML/CSS |
+| out | `analysis` | application/json | the winning reference's structural decomposition |
+| out | `board` | image/jpeg | the matched bank references (absent if the bank is empty) |
+
+[`agent-card.json`](./agent-card.json) is the authoritative list, with the
+full description of each artifact.
 
 ## Models
 

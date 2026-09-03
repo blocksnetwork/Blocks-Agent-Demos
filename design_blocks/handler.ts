@@ -263,7 +263,13 @@ export default async function handler(
   );
   const query = bank.entries.length ? await embedText(briefText || 'clean modern web app') : null;
   const topRefs = search(bank, query, briefText, 12).map((hit) => hit.entry);
-  const anchors = await pickTransferAnchors(topRefs, BANK_DIR);
+  // Composition anchors come from PAGE DESIGNS. Photography is imagery
+  // and a palette source, never a composition teacher — a brief about
+  // plants must not have its layout "transferred" from a moss macro just
+  // because CLIP ranked the moss first.
+  const uiBank = { ...bank, entries: bank.entries.filter((e) => e.kind === 'ui') };
+  const uiRefs = uiBank.entries.length ? search(uiBank, query, briefText, 8).map((hit) => hit.entry) : [];
+  const anchors = await pickTransferAnchors(uiRefs.length ? uiRefs : topRefs, BANK_DIR);
 
   /* 2 — product intent and style directions, concurrently. */
   ctx?.reportStatus('Understanding the product and sketching three directions...');
@@ -629,6 +635,8 @@ export default async function handler(
     compositionSource: winner.compositionSource,
     stance: winner.stance,
     referenceId: winner.anchor?.id ?? null,
+    referenceKind: winner.anchor?.kind ?? null,
+    anchorPool: uiRefs.length ? 'page-designs' : 'all-references',
     referenceSummary: winner.analysis?.summary ?? null,
     signaturePatternsUsed: winnerSpec?.source.signaturePatternsUsed ?? [],
     principles: winnerSpec?.principles ?? [],

@@ -16,11 +16,12 @@
   "scripts": {
     "check": "blocks check",
     "typecheck": "tsc --noEmit",
+    "test": "tsx test/quality-gate.test.ts && tsx test/craft-proxies.test.ts && tsx test/grammar-floors.ts",
     "demo:transfer": "tsx test/transfer-demo.ts",
     "smoke": "tsx test/handler-smoke.ts --worst && tsx test/handler-smoke.ts",
     "register": "blocks register",
     "start": "blocks run"
   },
   "type": "module",
-  "version": "0.1.0"
+  "version": "0.2.0"
 }
